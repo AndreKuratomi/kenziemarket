@@ -3,9 +3,10 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  ManyToMany,
+  ManyToOne,
   JoinTable,
 } from "typeorm";
+import { Cart } from "./Cart";
 
 import { User } from "./User";
 
@@ -25,6 +26,9 @@ export class Product {
 
   @CreateDateColumn()
   createdOn!: Date;
+
+  @ManyToOne((type) => User, (user) => user.products) user: User;
+  @ManyToOne((type) => Cart, (cart) => cart.products) cart: Cart;
 
   constructor(name: string, type: string, price: number) {
     this.name = name;

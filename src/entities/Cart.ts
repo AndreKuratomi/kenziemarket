@@ -6,6 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Product } from "./Product";
 
 import { User } from "./User";
 
@@ -29,6 +30,9 @@ export class Cart {
   @OneToOne((type) => User)
   @JoinColumn()
   user: User;
+
+  @OneToMany((type) => Product, (product) => product.user)
+  products: Product[];
 
   constructor(cartOwner: string, products: object[], totalPrice: number) {
     this.cartOwner = cartOwner;

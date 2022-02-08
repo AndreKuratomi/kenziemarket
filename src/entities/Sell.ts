@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { Cart } from "./Cart";
+import { User } from "./User";
 
 @Entity("sells")
 export class Sell {
@@ -32,6 +34,8 @@ export class Sell {
   @OneToOne((type) => Cart)
   @JoinColumn()
   cart: Cart;
+
+  @ManyToOne((type) => User, (user) => user.sells) user: User;
 
   constructor(
     clientName: string,

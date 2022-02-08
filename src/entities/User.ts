@@ -27,6 +27,11 @@ export class User {
   @CreateDateColumn()
   createdOn!: Date;
 
+  @OneToMany((type) => Product, (product) => product.user) products: Product[];
+
+  @OneToMany((type) => Sell, (sell) => sell.user)
+  sells: Sell[];
+
   constructor(name: string, email: string, password: string, isAdm: boolean) {
     this.name = name;
     this.email = email;
