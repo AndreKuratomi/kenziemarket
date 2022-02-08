@@ -3,7 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
+
+import { User } from "./User";
 
 @Entity("products")
 export class Product {

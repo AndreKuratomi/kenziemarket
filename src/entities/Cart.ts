@@ -2,8 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+
+import { User } from "./User";
 
 @Entity("cart")
 export class Cart {
@@ -21,6 +25,10 @@ export class Cart {
 
   @CreateDateColumn()
   createdOn!: Date;
+
+  @OneToOne((type) => User)
+  @JoinColumn()
+  user: User;
 
   constructor(cartOwner: string, products: object[], totalPrice: number) {
     this.cartOwner = cartOwner;

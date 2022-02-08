@@ -2,8 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+
+import { Cart } from "./Cart";
 
 @Entity("sells")
 export class Sell {
@@ -24,6 +28,10 @@ export class Sell {
 
   @CreateDateColumn()
   createdOn!: Date;
+
+  @OneToOne((type) => Cart)
+  @JoinColumn()
+  cart: Cart;
 
   constructor(
     clientName: string,
