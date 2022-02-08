@@ -4,6 +4,10 @@
   "main": "index.js",
   "author": "André Kuratomi <andrekuratomi@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev src/server.js"
+    "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
+  },
   "dependencies": {
     "express": "^4.17.2",
     "reflect-metadata": "^0.1.13",
