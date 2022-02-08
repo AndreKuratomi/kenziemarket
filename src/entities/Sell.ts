@@ -5,13 +5,16 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-@Entity("cart")
-export class Cart {
+@Entity("sells")
+export class Sell {
   @PrimaryGeneratedColumn()
   id!: string;
 
   @Column()
-  cartOwner: string;
+  clientName: string;
+
+  @Column()
+  clientEmail: string;
 
   @Column()
   products: object[];
@@ -22,8 +25,14 @@ export class Cart {
   @CreateDateColumn()
   createdOn!: Date;
 
-  constructor(cartOwner: string, products: object[], totalPrice: number) {
-    this.cartOwner = cartOwner;
+  constructor(
+    clientName: string,
+    clientEmail: string,
+    products: object[],
+    totalPrice: number
+  ) {
+    this.clientName = clientName;
+    this.clientEmail = clientEmail;
     this.products = products;
     this.totalPrice = totalPrice;
   }
