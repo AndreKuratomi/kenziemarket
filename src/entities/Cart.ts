@@ -22,9 +22,6 @@ export class Cart {
   @Column()
   products: object[];
 
-  @Column({ default: 0 })
-  totalPrice: number;
-
   @CreateDateColumn()
   createdOn!: Date;
 
