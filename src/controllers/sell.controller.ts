@@ -5,13 +5,13 @@ import { User } from "../entities/User";
 import { Product } from "../entities/Product";
 import { Cart } from "../entities/Cart";
 import { Sell } from "../entities/Sell";
-import { setFlagsFromString } from "v8";
+
+const userRepository = getRepository(User);
+const cartRepository = getRepository(Cart);
+const sellRepository = getRepository(Sell);
 
 export const makeSell = async (req: Request, res: Response) => {
   // pegar a compra pelo token do usuário
-  const userRepository = getRepository(User);
-  const cartRepository = getRepository(Cart);
-  const sellRepository = getRepository(Sell);
 
   try {
     // Coisas de token
@@ -76,9 +76,106 @@ export const makeSell = async (req: Request, res: Response) => {
 };
 
 export const listAllSells = async (req: Request, res: Response) => {
-  // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+  try {
+    // Coisas de token
+    const auth = req.headers.authorization;
+
+    if (auth === undefined) {
+      throw new ErrorHandler("Headers unabled!", 400);
+    }
+
+    const tokenItself = auth.split(" ")[1];
+
+    jwt.verify(tokenItself, config.secret as string, (err: any) => {
+      if (err) {
+        throw new ErrorHandler("Invalid token!", 401);
+      }
+    });
+
+    // Coisas de Admin
+    const isValidAdm = await userRepository.find({ isAdm: true });
+
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (error, decoded: any) => {
+        for (let i = 0; i < isValidAdm.length; i++) {
+          if (isValidAdm[i].id === decoded.id) {
+            // Coisas do registro
+            const allSells = await sellRepository.find();
+
+            return allSells;
+          }
+        }
+
+        throw new ErrorHandler("This user is not an administrator!", 401);
+      }
+    );
+  } catch (error: any) {
+    res.status(error.statusCode).json({ message: error.message });
+  }
 };
 
 export const listOneSell = async (req: Request, res: Response) => {
-  // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+  const { id } = req.params;
+
+  try {
+    // Coisas de token
+    const auth = req.headers.authorization;
+
+    if (auth === undefined) {
+      throw new ErrorHandler("Headers unabled!", 400);
+    }
+
+    const tokenItself = auth.split(" ")[1];
+
+    jwt.verify(tokenItself, config.secret as string, (err: any) => {
+      if (err) {
+        throw new ErrorHandler("Invalid token!", 401);
+      }
+    });
+
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (err, decoded: any) => {
+        const tokenId = decoded.id;
+        const userProfile = await userRepository.findOne({ id: tokenId });
+        if (!userProfile) {
+          throw new ErrorHandler("No user found!", 404);
+        }
+      }
+    );
+
+    // Coisas de Admin
+    const isValidAdm = await userRepository.find({ isAdm: true });
+
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (error, decoded: any) => {
+        for (let i = 0; i < isValidAdm.length; i++) {
+          if (isValidAdm[i].id === decoded.id) {
+            // Coisas da listagem
+            const sell = await sellRepository.findOne({ id });
+            if (!sell) {
+              throw new ErrorHandler("No sell found!", 404);
+            }
+
+            return sell;
+          }
+        }
+
+        if (decoded.id === id) {
+          const cart = await cartRepository.findOne({ id });
+
+          return cart;
+        } else if (decoded.id !== id) {
+          throw new ErrorHandler("Only admins may check non self-carts!", 401);
+        }
+      }
+    );
+  } catch (error: any) {
+    res.status(error.statusCode).json({ message: error.message });
+  }
 };
