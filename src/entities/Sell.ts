@@ -33,9 +33,9 @@ export class Sell {
 
   @OneToOne((type) => Cart)
   @JoinColumn()
-  cart: Cart;
+  cart!: Cart;
 
-  @ManyToOne((type) => User, (user) => user.sells) user: User;
+  @ManyToOne((type) => User, (user) => user.sells) user!: User;
 
   constructor(
     clientName: string,

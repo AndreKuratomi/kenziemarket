@@ -5,6 +5,8 @@ import { Product } from "./Product";
 import { Cart } from "./Cart";
 import { Sell } from "./Sell";
 
+// ISSO TUDO VAI PARA OS CONTROLLERS!
+
 // Relação 1:1 User - Cart
 const asyncFunctionUser = async () => {
   const userRepository = getRepository(User);

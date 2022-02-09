@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Product } from "./Product";
+import { Sell } from "./Sell";
 
 @Entity("users")
 export class User {
@@ -27,10 +28,10 @@ export class User {
   @CreateDateColumn()
   createdOn!: Date;
 
-  @OneToMany((type) => Product, (product) => product.user) products: Product[];
+  @OneToMany((type) => Product, (product) => product.user) products!: Product[];
 
   @OneToMany((type) => Sell, (sell) => sell.user)
-  sells: Sell[];
+  sells!: Sell[];
 
   constructor(name: string, email: string, password: string, isAdm: boolean) {
     this.name = name;

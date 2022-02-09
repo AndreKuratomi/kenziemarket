@@ -3,11 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Product } from "./Product";
 
+import { Product } from "./Product";
 import { User } from "./User";
 
 @Entity("cart")
@@ -29,10 +30,10 @@ export class Cart {
 
   @OneToOne((type) => User)
   @JoinColumn()
-  user: User;
+  user!: User;
 
   @OneToMany((type) => Product, (product) => product.user)
-  products: Product[];
+  product!: Product[];
 
   constructor(cartOwner: string, products: object[], totalPrice: number) {
     this.cartOwner = cartOwner;
