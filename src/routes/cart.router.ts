@@ -12,9 +12,9 @@ import {
 const route = Router();
 
 export const cartRouter = () => {
-  route.post("/cart", addToCart);
-  route.get("/cart", listAllCarts);
-  route.get("/cart/:id", listOneCart);
-  route.delete("/cart/:product_id", deleteCart);
+  route.post("", addToCart);
+  route.get("", listAllCarts);
+  route.get("/:id", listOneCart);
+  route.delete("/:product_id", deleteCart);
   return route;
 };

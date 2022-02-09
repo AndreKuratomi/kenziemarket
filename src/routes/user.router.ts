@@ -12,9 +12,9 @@ import {
 const route = Router();
 
 export const userRouter = () => {
-  route.post("/user", registerUser);
+  route.post("", registerUser);
   route.post("/login", loginUser);
-  route.get("/user", listUsers);
-  route.get("/user/:id", listOneUser);
+  route.get("", listUsers);
+  route.get("/:id", listOneUser);
   return route;
 };

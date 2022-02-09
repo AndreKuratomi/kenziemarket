@@ -11,8 +11,8 @@ import {
 const route = Router();
 
 export const sellRouter = () => {
-  route.post("/buy", makeSell);
-  route.get("/buy", listAllSells);
-  route.get("/buy/:id", listOneSell);
+  route.post("", makeSell);
+  route.get("", listAllSells);
+  route.get("/:id", listOneSell);
   return route;
 };

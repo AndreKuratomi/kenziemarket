@@ -11,8 +11,8 @@ import {
 const route = Router();
 
 export const productRouter = () => {
-  route.post("/product", registerProduct);
-  route.get("/product", listAllProducts);
-  route.get("/product/:id", listOneProduct);
+  route.post("", registerProduct);
+  route.get("", listAllProducts);
+  route.get("/:id", listOneProduct);
   return route;
 };
