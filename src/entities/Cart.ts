@@ -22,7 +22,7 @@ export class Cart {
   @Column()
   products: object[];
 
-  @Column()
+  @Column({ default: 0 })
   totalPrice: number;
 
   @CreateDateColumn()

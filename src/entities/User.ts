@@ -3,8 +3,10 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Cart } from "./Cart";
 import { Product } from "./Product";
 import { Sell } from "./Sell";
 
@@ -22,14 +24,17 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  cart: object[];
+  // @Column()
+  // cart: object[];
 
   @Column()
   isAdm: boolean;
 
   @CreateDateColumn()
   createdOn!: Date;
+
+  @OneToOne((type) => Cart, (cart) => cart.user)
+  cart!: Cart;
 
   // @OneToMany((type) => Product, (product) => product.user) products!: Product[];
 
