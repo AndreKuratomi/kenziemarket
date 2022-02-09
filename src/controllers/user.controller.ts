@@ -69,8 +69,107 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const listUsers = async (req: Request, res: Response) => {
   // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+
+  // Coisas de token
+  const auth = req.headers.authorization;
+
+  if (auth === undefined) {
+    throw new ErrorHandler("Headers unabled!", 400);
+  }
+
+  const tokenItself = auth.split(" ")[1];
+
+  jwt.verify(tokenItself, config.secret as string, (err: any) => {
+    if (err) {
+      throw new ErrorHandler("Invalid token!", 401);
+    }
+  });
+
+  // Coisas de Admin
+  const usersRepository = getRepository(User);
+
+  const isValidAdm = await usersRepository.find({ isAdm: true });
+  // try {
+  jwt.verify(tokenItself, config.secret as string, (error, decoded: any) => {
+    for (let i = 0; i < isValidAdm.length; i++) {
+      if (isValidAdm[i].id === decoded.id) {
+        // return "";
+        // Coisas da listagem
+        const allUsers = usersRepository.find();
+
+        return allUsers;
+      }
+    }
+
+    throw new ErrorHandler("This user is not an administrator!", 401);
+  });
 };
 
 export const listOneUser = async (req: Request, res: Response) => {
   // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+
+  const { id } = req.params;
+
+  const userRepository = getRepository(User);
+
+  // Coisas de token
+  const auth = req.headers.authorization;
+
+  if (auth === undefined) {
+    throw new ErrorHandler("Headers unabled!", 400);
+  }
+
+  const tokenItself = auth.split(" ")[1];
+
+  jwt.verify(tokenItself, config.secret as string, (err: any) => {
+    if (err) {
+      throw new ErrorHandler("Invalid token!", 401);
+    }
+  });
+
+  try {
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (err, decoded: any) => {
+        const tokenId = decoded.id;
+        const userProfile = await userRepository.findOne({ id: tokenId });
+        if (!userProfile) {
+          throw new ErrorHandler("No user found!", 404);
+        }
+
+        request.userProfile = userProfile;
+
+        return next();
+      }
+    );
+  }
+
+  // Coisas de Admin
+  const isValidAdm = await userRepository.find({ isAdm: true });
+  // try {
+  jwt.verify(tokenItself, config.secret as string, (error, decoded: any) => {
+    for (let i = 0; i < isValidAdm.length; i++) {
+      if (isValidAdm[i].id === decoded.id) {
+        // return "";
+        // Coisas da listagem
+        const user = await userRepository.findOne({id});
+        
+        return user;
+      }
+    }
+    
+    if (decoded.id === id) {
+      const user = await userRepository.findOne({id});
+        
+      return user;
+
+    } else if (decoded.id !== id) {
+      throw new ErrorHandler(
+        "Only admins may update non self-profiles!",
+        401
+      );
+    }
+  });
+
 };
