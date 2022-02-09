@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  # node_backend:
+  #   image: node:latest
+  #   restart: always
+  #   build: .
+  #   ports: [3000:4000]
+  #   volumes:
+  #     - .:/code
+  #   environment:
+  #     [PGUSER=postgres, PGPASSWORD=12345, PGDATABASE=kenzie_market, PGHOST=db]
+  #   depends_on:
+  #     - db
+
+  db:
+    image: postgres:latest
+    restart: always
+    ports: [5430:5432]
+    environment:
+      [
+        POSTGRES_USER=postgres,
+        POSTGRES_PASSWORD=12345,
+        POSTGRES_DB=kenzie_market,
+      ]
+
+  adminer:
+    image: adminer
+    restart: always
+    ports: [8080:8080]
