@@ -27,6 +27,20 @@ export const loginUser = async (req: Request, res: Response) => {
   // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
   const { email, password } = req.body;
 
+  const auth = req.headers.authorization;
+
+  if (auth === undefined) {
+    throw new ErrorHandler("Headers unabled!", 400);
+  }
+
+  const tokenItself = auth.split(" ")[1];
+
+  jwt.verify(tokenItself, config.secret as string, (err: any) => {
+    if (err) {
+      throw new ErrorHandler("Invalid token!", 401);
+    }
+  });
+
   const userRepository = getRepository(User);
 
   const doesUserExist = await userRepository.findOne({ email });
