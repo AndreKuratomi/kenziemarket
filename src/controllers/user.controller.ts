@@ -25,6 +25,32 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+  const { email, password } = req.body;
+
+  const userRepository = getRepository(User);
+
+  const doesUserExist = await userRepository.findOne({ email });
+
+  if (doesUserExist === undefined) {
+    throw new ErrorHandler("No user found!", 401);
+  }
+
+  const doesPasswordMatch = await bcrypt.compare(
+    password,
+    doesUserExist.password
+  );
+
+  if (!doesPasswordMatch) {
+    throw new ErrorHandler("Given password mismatch!", 401);
+  }
+
+  const id = doesUserExist.id;
+
+  const token: string = jwt.sign({ id }, config.secret as string, {
+    expiresIn: config.expiresIn,
+  });
+
+  return res.json({ token: token });
 };
 
 export const listUsers = async (req: Request, res: Response) => {
