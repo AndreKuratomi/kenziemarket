@@ -182,6 +182,65 @@ export const listOneCart = async (req: Request, res: Response) => {
 
 export const deleteCart = async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
+    const userRepository = getRepository(User);
+    const cartRepository = getRepository(Cart);
+
+    // Coisas de token
+    const auth = req.headers.authorization;
+
+    if (auth === undefined) {
+      throw new ErrorHandler("Headers unabled!", 400);
+    }
+
+    const tokenItself = auth.split(" ")[1];
+
+    jwt.verify(tokenItself, config.secret as string, (err: any) => {
+      if (err) {
+        throw new ErrorHandler("Invalid token!", 401);
+      }
+    });
+
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (err, decoded: any) => {
+        const tokenId = decoded.id;
+        const userProfile = await userRepository.findOne({ id: tokenId });
+        if (!userProfile) {
+          throw new ErrorHandler("No user found!", 404);
+        }
+      }
+    );
+
+    const isValidAdm = await userRepository.find({ isAdm: true });
+
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (error, decoded: any) => {
+        for (let i = 0; i < isValidAdm.length; i++) {
+          if (isValidAdm[i].id === decoded.id) {
+            // Coisas da listagem
+            await cartRepository.delete(id);
+            if (!cart) {
+              throw new ErrorHandler("No cart found!", 404);
+            }
+
+            return cart;
+          }
+        }
+
+        if (decoded.id === id) {
+          await cartRepository.delete(id);
+        } else if (decoded.id !== id) {
+          throw new ErrorHandler(
+            "Only admins or the own user may delete its cart!",
+            401
+          );
+        }
+      }
+    );
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
