@@ -27,7 +27,7 @@ export class Product {
   @CreateDateColumn()
   createdOn!: Date;
 
-  @ManyToOne((type) => User, (user) => user.products) user!: User;
+  // @ManyToOne((type) => User, (user) => user.products) user!: User;
   @ManyToOne((type) => Cart, (cart) => cart.products) cart!: Cart;
 
   constructor(name: string, type: string, price: number) {

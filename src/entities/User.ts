@@ -28,7 +28,7 @@ export class User {
   @CreateDateColumn()
   createdOn!: Date;
 
-  @OneToMany((type) => Product, (product) => product.user) products!: Product[];
+  // @OneToMany((type) => Product, (product) => product.user) products!: Product[];
 
   @OneToMany((type) => Sell, (sell) => sell.user)
   sells!: Sell[];

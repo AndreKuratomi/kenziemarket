@@ -32,7 +32,7 @@ export class Cart {
   @JoinColumn()
   user!: User;
 
-  @OneToMany((type) => Product, (product) => product.user)
+  // @OneToMany((type) => Product, (product) => product.user)
   product!: Product[];
 
   constructor(cartOwner: string, products: object[], totalPrice: number) {
