@@ -23,6 +23,9 @@ export class User {
   password: string;
 
   @Column()
+  cart: object[];
+
+  @Column()
   isAdm: boolean;
 
   @CreateDateColumn()
@@ -33,10 +36,17 @@ export class User {
   @OneToMany((type) => Sell, (sell) => sell.user)
   sells!: Sell[];
 
-  constructor(name: string, email: string, password: string, isAdm: boolean) {
+  constructor(
+    name: string,
+    email: string,
+    password: string,
+    cart: object[],
+    isAdm: boolean
+  ) {
     this.name = name;
     this.email = email;
     this.password = password;
+    this.cart = cart;
     this.isAdm = isAdm;
   }
 }
