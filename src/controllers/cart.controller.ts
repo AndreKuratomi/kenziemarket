@@ -72,6 +72,9 @@ export const addToCart = async (req: Request, res: Response) => {
 };
 
 export const listAllCarts = async (req: Request, res: Response) => {
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
+
   try {
     // Coisas de token
     const auth = req.headers.authorization;
@@ -88,27 +91,23 @@ export const listAllCarts = async (req: Request, res: Response) => {
       }
     });
 
-    const id: string = req.body.id;
-
-    const doesAcquiredProductExist = productRepository.findOne({ id });
-
-    if (!doesAcquiredProductExist) {
-      throw new ErrorHandler("No product found!", 404);
-    }
+    // Coisas de Admin
+    const isValidAdm = await userRepository.find({ isAdm: true });
 
     jwt.verify(
       tokenItself,
       config.secret as string,
-      async (err, decoded: any) => {
-        const tokenId = decoded.id;
-        const userProfile = await userRepository.findOne({ id: tokenId });
-        if (!userProfile) {
-          throw new ErrorHandler("No user found!", 404);
+      async (error, decoded: any) => {
+        for (let i = 0; i < isValidAdm.length; i++) {
+          if (isValidAdm[i].id === decoded.id) {
+            // Coisas do registro
+            const allCarts = await cartRepository.find();
+
+            return allCarts;
+          }
         }
 
-        const user = await userRepository.findOne({ id: tokenId });
-
-        cartRepository.increment;
+        throw new ErrorHandler("This user is not an administrator!", 401);
       }
     );
   } catch (error: any) {
