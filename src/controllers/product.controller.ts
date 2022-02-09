@@ -53,9 +53,58 @@ export const registerProduct = async (req: Request, res: Response) => {
 };
 
 export const listAllProducts = async (req: Request, res: Response) => {
-  // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+  const productRepository = getRepository(Product);
+
+  try {
+    // Coisas de token
+    const auth = req.headers.authorization;
+
+    if (auth === undefined) {
+      throw new ErrorHandler("Headers unabled!", 400);
+    }
+
+    const tokenItself = auth.split(" ")[1];
+
+    jwt.verify(tokenItself, config.secret as string, (err: any) => {
+      if (err) {
+        throw new ErrorHandler("Invalid token!", 401);
+      }
+    });
+
+    const allProducts = productRepository.find();
+
+    return allProducts;
+  } catch (error: any) {
+    res.status(error.statusCode).json({ message: error.message });
+  }
 };
 
 export const listOneProduct = async (req: Request, res: Response) => {
-  // try {} catch (error: any) {res.status(error.statusCode).json({message: error.message})}
+  const { id } = req.params;
+  const productRepository = getRepository(Product);
+  try {
+    // Coisas de token
+    const auth = req.headers.authorization;
+
+    if (auth === undefined) {
+      throw new ErrorHandler("Headers unabled!", 400);
+    }
+
+    const tokenItself = auth.split(" ")[1];
+
+    jwt.verify(tokenItself, config.secret as string, (err: any) => {
+      if (err) {
+        throw new ErrorHandler("Invalid token!", 401);
+      }
+    });
+
+    const product = productRepository.findOne({ id });
+    if (!product) {
+      throw new ErrorHandler("No user found!", 404);
+    }
+
+    return product;
+  } catch (error: any) {
+    res.status(error.statusCode).json({ message: error.message });
+  }
 };
