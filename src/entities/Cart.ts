@@ -22,9 +22,6 @@ export class Cart {
   @Column()
   products: object[];
 
-  @Column()
-  totalPrice: number;
-
   @CreateDateColumn()
   createdOn!: Date;
 
@@ -33,7 +30,7 @@ export class Cart {
   user!: User;
 
   // @OneToMany((type) => Product, (product) => product.user)
-  product!: Product[];
+  // product!: Product[];
 
   constructor(cartOwner: string, products: object[], totalPrice: number) {
     this.cartOwner = cartOwner;

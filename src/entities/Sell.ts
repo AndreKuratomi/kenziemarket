@@ -22,10 +22,10 @@ export class Sell {
   @Column()
   clientEmail: string;
 
-  @Column()
-  products: object[];
+  // @Column()
+  // products: object[];
 
-  @Column()
+  @Column({ default: 0 })
   totalPrice: number;
 
   @CreateDateColumn()
@@ -40,12 +40,12 @@ export class Sell {
   constructor(
     clientName: string,
     clientEmail: string,
-    products: object[],
+    // products: object[],
     totalPrice: number
   ) {
     this.clientName = clientName;
     this.clientEmail = clientEmail;
-    this.products = products;
+    // this.products = products;
     this.totalPrice = totalPrice;
   }
 }

@@ -127,23 +127,17 @@ export const listOneUser = async (req: Request, res: Response) => {
     }
   });
 
-  try {
-    jwt.verify(
-      tokenItself,
-      config.secret as string,
-      async (err, decoded: any) => {
-        const tokenId = decoded.id;
-        const userProfile = await userRepository.findOne({ id: tokenId });
-        if (!userProfile) {
-          throw new ErrorHandler("No user found!", 404);
-        }
-
-        request.userProfile = userProfile;
-
-        return next();
+  jwt.verify(
+    tokenItself,
+    config.secret as string,
+    async (err, decoded: any) => {
+      const tokenId = decoded.id;
+      const userProfile = await userRepository.findOne({ id: tokenId });
+      if (!userProfile) {
+        throw new ErrorHandler("No user found!", 404);
       }
-    );
-  }
+    }
+  );
 
   // Coisas de Admin
   const isValidAdm = await userRepository.find({ isAdm: true });
@@ -153,23 +147,18 @@ export const listOneUser = async (req: Request, res: Response) => {
       if (isValidAdm[i].id === decoded.id) {
         // return "";
         // Coisas da listagem
-        const user = await userRepository.findOne({id});
-        
+        const user = await userRepository.findOne({ id });
+
         return user;
       }
     }
-    
-    if (decoded.id === id) {
-      const user = await userRepository.findOne({id});
-        
-      return user;
 
+    if (decoded.id === id) {
+      const user = await userRepository.findOne({ id });
+
+      return user;
     } else if (decoded.id !== id) {
-      throw new ErrorHandler(
-        "Only admins may update non self-profiles!",
-        401
-      );
+      throw new ErrorHandler("Only admins may update non self-profiles!", 401);
     }
   });
-
 };

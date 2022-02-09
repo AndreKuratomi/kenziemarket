@@ -1,6 +1,6 @@
 {
   "type": "postgres",
-  "url": "postgresql://postgres:12345@localhost:5431/kenzie-market",
+  "url": "postgresql://abkura:1234@localhost:5432/kenzie_market",
   "synchronize": false,
   "logging": false,
   "entities": ["src/entities/**/*.ts"],
