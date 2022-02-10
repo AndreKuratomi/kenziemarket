@@ -19,7 +19,7 @@ export class Cart {
   @Column()
   cartOwner: string;
 
-  @Column()
+  @Column({ type: "text", array: true, default: [] })
   products: object[];
 
   @CreateDateColumn()
