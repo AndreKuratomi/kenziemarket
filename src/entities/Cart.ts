@@ -19,7 +19,7 @@ export class Cart {
   @Column()
   cartOwner: string;
 
-  @Column()
+  @Column({ type: "text", array: true, default: [] })
   products: object[];
 
   @CreateDateColumn()
@@ -35,6 +35,6 @@ export class Cart {
   constructor(cartOwner: string, products: object[], totalPrice: number) {
     this.cartOwner = cartOwner;
     this.products = products;
-    this.totalPrice = totalPrice;
+    // this.totalPrice = totalPrice;
   }
 }

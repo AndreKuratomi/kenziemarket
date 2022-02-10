@@ -45,13 +45,13 @@ export class User {
     name: string,
     email: string,
     password: string,
-    cart: object[],
+    // cart: object[],
     isAdm: boolean
   ) {
     this.name = name;
     this.email = email;
     this.password = password;
-    this.cart = cart;
+    // this.cart = cart;
     this.isAdm = isAdm;
   }
 }
