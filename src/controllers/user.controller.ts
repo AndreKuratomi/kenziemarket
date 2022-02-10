@@ -7,6 +7,7 @@ import config from "../config/jwt.config";
 import { User } from "../entities/User";
 import { Product } from "../entities/Product";
 import { Cart } from "../entities/Cart";
+import ErrorHandler from "../utils/errors";
 
 interface IUserBody {
   name: string;
