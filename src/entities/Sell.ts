@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { Cart } from "./Cart";
-import { User } from "./User";
+import Cart from "./Cart";
+import User from "./User";
 
 @Entity("sells")
 export class Sell {

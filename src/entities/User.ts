@@ -6,12 +6,12 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Cart } from "./Cart";
-import { Product } from "./Product";
+import Cart from "./Cart";
+
 import { Sell } from "./Sell";
 
 @Entity("users")
-export class User {
+class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
@@ -23,9 +23,6 @@ export class User {
 
   @Column()
   password: string;
-
-  // @Column()
-  // cart: object[];
 
   @Column()
   isAdm: boolean;
@@ -55,3 +52,5 @@ export class User {
     this.isAdm = isAdm;
   }
 }
+
+export default User;

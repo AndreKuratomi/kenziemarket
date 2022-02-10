@@ -1,18 +1,16 @@
+import User from "./User";
+
 import {
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  Entity,
   JoinColumn,
-  OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { Product } from "./Product";
-import { User } from "./User";
-
 @Entity("cart")
-export class Cart {
+class Cart {
   @PrimaryGeneratedColumn()
   id!: string;
 
@@ -38,3 +36,5 @@ export class Cart {
     // this.totalPrice = totalPrice;
   }
 }
+
+export default Cart;

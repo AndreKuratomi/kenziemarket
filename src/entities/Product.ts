@@ -6,9 +6,9 @@ import {
   ManyToOne,
   JoinTable,
 } from "typeorm";
-import { Cart } from "./Cart";
+import Cart from "./Cart";
 
-import { User } from "./User";
+import User from "./User";
 
 @Entity("products")
 export class Product {

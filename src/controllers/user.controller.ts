@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 
 import config from "../config/jwt.config";
-import { User } from "../entities/User";
+import User from "../entities/User";
 import UserRepository from "../repository/user.repository";
 import ErrorHandler from "../utils/errors";
 
@@ -105,7 +105,7 @@ export const listUsers = async (req: Request, res: Response) => {
             return res.json(allUsers);
           }
         }
-
+        // POR QUE NÃO ESTÁ RETORNANDO????
         throw new ErrorHandler("This user is not an administrator!", 401);
       }
     );
@@ -119,6 +119,11 @@ export const listOneUser = async (req: Request, res: Response) => {
 
   const userRepository = getRepository(User);
   try {
+    console.log(id);
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+
     // Coisas de token
     const auth = req.headers.authorization;
 

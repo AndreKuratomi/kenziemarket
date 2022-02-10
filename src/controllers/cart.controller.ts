@@ -3,17 +3,10 @@ import { getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
 import config from "../config/jwt.config";
-import { User } from "../entities/User";
+import User from "../entities/User";
 import { Product } from "../entities/Product";
-import { Cart } from "../entities/Cart";
+import Cart from "../entities/Cart";
 import ErrorHandler from "../utils/errors";
-
-// export const createCart = async (req: Request, res: Response) => {
-//   try {
-//   } catch (error: any) {
-//     res.status(error.statusCode).json({ message: error.message });
-//   }
-// };
 
 export const addToCart = async (req: Request, res: Response) => {
   const { id, name, type, price } = req.body;
@@ -21,7 +14,7 @@ export const addToCart = async (req: Request, res: Response) => {
   const userRepository = getRepository(User);
   const productRepository = getRepository(Product);
   const cartRepository = getRepository(Cart);
-
+  console.log(cartRepository.find());
   try {
     // Coisas de token
     const auth = req.headers.authorization;
@@ -32,6 +25,10 @@ export const addToCart = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
+
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -40,8 +37,7 @@ export const addToCart = async (req: Request, res: Response) => {
 
     const id: string = req.body.id;
 
-    const doesAcquiredProductExist = await productRepository.findOne({ id });
-
+    const doesAcquiredProductExist = await productRepository.findOne(id);
     if (!doesAcquiredProductExist) {
       throw new ErrorHandler("No product found!", 404);
     }
@@ -56,7 +52,7 @@ export const addToCart = async (req: Request, res: Response) => {
           throw new ErrorHandler("No user found!", 404);
         }
 
-        const cart = await cartRepository.findOne({ userId: tokenId });
+        const cart = await cartRepository.findOne({ user: tokenId });
         if (!cart) {
           throw new ErrorHandler("No cart found!", 404);
         }
@@ -88,6 +84,9 @@ export const listAllCarts = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -133,6 +132,9 @@ export const listOneCart = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -198,6 +200,9 @@ export const deleteCart = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
