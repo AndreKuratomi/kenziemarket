@@ -45,7 +45,7 @@ export class User {
     name: string,
     email: string,
     password: string,
-    cart: object[],
+    // cart: object[],
     isAdm: boolean
   ) {
     this.name = name;
