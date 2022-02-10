@@ -10,10 +10,9 @@ import ErrorHandler from "../utils/errors";
 
 export const registerUser = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
-  const userRepository = getRepository(User);
+  // const userRepository = getRepository(User);
   try {
     let { name, email, password, isAdm } = req.body;
-    console.log(req.body);
 
     const emailAlreadyExists = await UserCustomRepository.findOne({ email });
 
@@ -24,43 +23,21 @@ export const registerUser = async (req: Request, res: Response) => {
     const hashing = await bcrypt.hash(password as string, 10);
     password = hashing;
 
-    const user = UserCustomRepository.create(req.body);
-    console.log(user);
+    const newBody = { name, email, password, isAdm };
+
+    const user = UserCustomRepository.create(newBody);
 
     await UserCustomRepository.save(user);
-    // res.send(user);
-    // const iuser = await UserCustomRepository.execute({
-    //   name,
-    //   email,
-    //   password,
-    //   isAdm,
-    // });
-    console.log(user);
 
     return res.json(user);
   } catch (error: any) {
-    console.log(error);
-    res.status(400).json({ message: error.message });
+    res.status(error.statusCode).json({ message: error.message });
   }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
-    const auth = req.headers.authorization;
-
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
-
     const userRepository = getRepository(User);
 
     const doesUserExist = await userRepository.findOne({ email });
@@ -101,6 +78,10 @@ export const listUsers = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
+
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -111,20 +92,23 @@ export const listUsers = async (req: Request, res: Response) => {
     const usersRepository = getRepository(User);
 
     const isValidAdm = await usersRepository.find({ isAdm: true });
-    // try {
-    jwt.verify(tokenItself, config.secret as string, (error, decoded: any) => {
-      for (let i = 0; i < isValidAdm.length; i++) {
-        if (isValidAdm[i].id === decoded.id) {
-          // return "";
-          // Coisas da listagem
-          const allUsers = usersRepository.find();
 
-          return allUsers;
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (error, decoded: any) => {
+        for (let i = 0; i < isValidAdm.length; i++) {
+          if (isValidAdm[i].id === decoded.id) {
+            // Coisas da listagem
+            const allUsers = await usersRepository.find();
+
+            return res.json(allUsers);
+          }
         }
-      }
 
-      throw new ErrorHandler("This user is not an administrator!", 401);
-    });
+        throw new ErrorHandler("This user is not an administrator!", 401);
+      }
+    );
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
@@ -144,11 +128,20 @@ export const listOneUser = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
+
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
       }
     });
+
+    const userId = await userRepository.findOne({ id });
+    if (!userId) {
+      throw new ErrorHandler("No user found!", 404);
+    }
 
     jwt.verify(
       tokenItself,
@@ -156,39 +149,33 @@ export const listOneUser = async (req: Request, res: Response) => {
       async (err, decoded: any) => {
         const tokenId = decoded.id;
         const userProfile = await userRepository.findOne({ id: tokenId });
-        if (!userProfile) {
-          throw new ErrorHandler("No user found!", 404);
-        }
+        console.log(userProfile);
       }
     );
 
     // Coisas de Admin
     const isValidAdm = await userRepository.find({ isAdm: true });
-    // try {
+
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
-            // return "";
-            // Coisas da listagem
-            const user = await userRepository.findOne({ id });
-
-            return user;
+            return res.json(userId);
           }
         }
 
         if (decoded.id === id) {
           const user = await userRepository.findOne({ id });
 
-          return user;
-        } else if (decoded.id !== id) {
-          throw new ErrorHandler(
-            "Only admins may update non self-profiles!",
-            401
-          );
+          return res.json(user);
         }
+        // POR QUE NÃO ESTÁ RETORNANDO????
+        // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
+        res
+          .status(400)
+          .json({ message: "Only admins may list non self-profiles!" });
       }
     );
   } catch (error: any) {
