@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import config from "../config/jwt.config";
 import { Product } from "../entities/Product";
 import { User } from "../entities/User";
+import ErrorHandler from "../utils/errors";
 
 export const registerProduct = async (req: Request, res: Response) => {
   const { name, type, price } = req.body;

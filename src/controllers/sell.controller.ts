@@ -7,6 +7,7 @@ import { User } from "../entities/User";
 import { Product } from "../entities/Product";
 import { Cart } from "../entities/Cart";
 import { Sell } from "../entities/Sell";
+import ErrorHandler from "../utils/errors";
 
 const userRepository = getRepository(User);
 const cartRepository = getRepository(Cart);
