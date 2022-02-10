@@ -106,7 +106,8 @@ export const listUsers = async (req: Request, res: Response) => {
           }
         }
         // POR QUE NÃO ESTÁ RETORNANDO????
-        throw new ErrorHandler("This user is not an administrator!", 401);
+        // throw new ErrorHandler("This user is not an administrator!", 401);
+        res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
@@ -119,9 +120,8 @@ export const listOneUser = async (req: Request, res: Response) => {
 
   const userRepository = getRepository(User);
   try {
-    console.log(id);
-    if (!id) {
-      throw new ErrorHandler("No id found!", 404);
+    if (id.length !== 36) {
+      throw new ErrorHandler("Id must be uuid!", 404);
     }
 
     // Coisas de token
@@ -165,6 +165,7 @@ export const listOneUser = async (req: Request, res: Response) => {
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
+        console.log(decoded.id);
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             return res.json(userId);
@@ -175,12 +176,13 @@ export const listOneUser = async (req: Request, res: Response) => {
           const user = await userRepository.findOne({ id });
 
           return res.json(user);
+        } else {
+          // POR QUE NÃO ESTÁ RETORNANDO????
+          // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
+          res
+            .status(400)
+            .json({ message: "Only admins may list non self-profiles!" });
         }
-        // POR QUE NÃO ESTÁ RETORNANDO????
-        // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
-        res
-          .status(400)
-          .json({ message: "Only admins may list non self-profiles!" });
       }
     );
   } catch (error: any) {
