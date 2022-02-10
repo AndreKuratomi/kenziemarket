@@ -1,22 +1,46 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getCustomRepository, getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 
 import config from "../config/jwt.config";
 import { User } from "../entities/User";
+import UserRepository from "../repository/user.repository";
 import ErrorHandler from "../utils/errors";
 
 export const registerUser = async (req: Request, res: Response) => {
-  const { name, email, password, isAdm } = req.body;
+  const UserCustomRepository = getCustomRepository(UserRepository);
+  const userRepository = getRepository(User);
   try {
-    const userRepository = getRepository(User);
-    const user = userRepository.create({ name, email, password, isAdm });
+    let { name, email, password, isAdm } = req.body;
+    console.log(req.body);
 
-    await userRepository.save(user);
-    res.send(user);
+    const emailAlreadyExists = await UserCustomRepository.findOne({ email });
+
+    if (emailAlreadyExists) {
+      throw new ErrorHandler("Email already registered!", 403);
+    }
+
+    const hashing = await bcrypt.hash(password as string, 10);
+    password = hashing;
+
+    const user = UserCustomRepository.create(req.body);
+    console.log(user);
+
+    await UserCustomRepository.save(user);
+    // res.send(user);
+    // const iuser = await UserCustomRepository.execute({
+    //   name,
+    //   email,
+    //   password,
+    //   isAdm,
+    // });
+    console.log(user);
+
+    return res.json(user);
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    console.log(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
