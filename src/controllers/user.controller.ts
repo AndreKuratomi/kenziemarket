@@ -10,7 +10,7 @@ import ErrorHandler from "../utils/errors";
 
 export const registerUser = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
-  const userRepository = getRepository(User);
+  // const userRepository = getRepository(User);
   try {
     let { name, email, password, isAdm } = req.body;
 
