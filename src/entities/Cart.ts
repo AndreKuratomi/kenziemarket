@@ -11,7 +11,7 @@ import {
 
 @Entity("cart")
 class Cart {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column()

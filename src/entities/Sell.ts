@@ -12,8 +12,8 @@ import Cart from "./Cart";
 import User from "./User";
 
 @Entity("sells")
-export class Sell {
-  @PrimaryGeneratedColumn()
+class Sell {
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column()
@@ -49,3 +49,5 @@ export class Sell {
     this.totalPrice = totalPrice;
   }
 }
+
+export default Sell;

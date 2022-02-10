@@ -8,6 +8,8 @@ import { Product } from "../entities/Product";
 import Cart from "../entities/Cart";
 import ErrorHandler from "../utils/errors";
 
+
+
 export const addToCart = async (req: Request, res: Response) => {
   const { id, name, type, price } = req.body;
 

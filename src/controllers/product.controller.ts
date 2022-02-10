@@ -14,6 +14,12 @@ export const registerProduct = async (req: Request, res: Response) => {
   const userRepository = getRepository(User);
 
   try {
+    const productAlreadyExists = await productRepository.findOne({ name });
+
+    if (productAlreadyExists) {
+      throw new ErrorHandler("Product already registered!", 403);
+    }
+
     // Coisas de token
     const auth = req.headers.authorization;
 

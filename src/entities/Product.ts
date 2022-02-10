@@ -12,7 +12,7 @@ import User from "./User";
 
 @Entity("products")
 export class Product {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column()

@@ -6,9 +6,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import Cart from "./Cart";
 
-import { Sell } from "./Sell";
+import Cart from "./Cart";
+import Sell from "./Sell";
 
 @Entity("users")
 class User {
