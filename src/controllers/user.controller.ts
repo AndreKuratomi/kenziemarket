@@ -13,7 +13,7 @@ export const registerUser = async (req: Request, res: Response) => {
   const userRepository = getRepository(User);
   try {
     let { name, email, password, isAdm } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     const emailAlreadyExists = await UserCustomRepository.findOne({ email });
 
@@ -24,8 +24,10 @@ export const registerUser = async (req: Request, res: Response) => {
     const hashing = await bcrypt.hash(password as string, 10);
     password = hashing;
 
-    const user = UserCustomRepository.create(req.body);
-    console.log(user);
+    const newBody = { name, email, password, isAdm };
+
+    const user = UserCustomRepository.create(newBody);
+    // console.log(user);
 
     await UserCustomRepository.save(user);
     // res.send(user);
@@ -35,32 +37,16 @@ export const registerUser = async (req: Request, res: Response) => {
     //   password,
     //   isAdm,
     // });
-    console.log(user);
 
     return res.json(user);
   } catch (error: any) {
-    console.log(error);
-    res.status(400).json({ message: error.message });
+    res.status(error.statusCode).json({ message: error.message });
   }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
-    const auth = req.headers.authorization;
-
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
-
     const userRepository = getRepository(User);
 
     const doesUserExist = await userRepository.findOne({ email });

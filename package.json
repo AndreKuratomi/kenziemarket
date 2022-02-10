@@ -9,13 +9,15 @@
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
+    "@types/uuid": "^8.3.4",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.41"
+    "typeorm": "^0.2.41",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
