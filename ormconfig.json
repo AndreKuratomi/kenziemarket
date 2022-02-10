@@ -1,6 +1,10 @@
 {
   "type": "postgres",
-  "url": "postgresql://abkura:1234@localhost:5432/kenzie_market",
+  "username": "postgres",
+  "password": "1234",
+  "host": "localhost",
+  "port": "5430",
+  "database": "kenzie_market",
   "synchronize": false,
   "logging": false,
   "entities": ["src/entities/**/*.ts"],
