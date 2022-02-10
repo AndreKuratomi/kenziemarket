@@ -63,9 +63,9 @@ export const listAllProducts = async (req: Request, res: Response) => {
   const productRepository = getRepository(Product);
 
   try {
-    const allProducts = productRepository.find();
+    const allProducts = await productRepository.find();
 
-    return allProducts;
+    return res.json(allProducts);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
