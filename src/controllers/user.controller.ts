@@ -13,7 +13,6 @@ export const registerUser = async (req: Request, res: Response) => {
   const userRepository = getRepository(User);
   try {
     let { name, email, password, isAdm } = req.body;
-    // console.log(req.body);
 
     const emailAlreadyExists = await UserCustomRepository.findOne({ email });
 
@@ -27,16 +26,8 @@ export const registerUser = async (req: Request, res: Response) => {
     const newBody = { name, email, password, isAdm };
 
     const user = UserCustomRepository.create(newBody);
-    // console.log(user);
 
     await UserCustomRepository.save(user);
-    // res.send(user);
-    // const iuser = await UserCustomRepository.execute({
-    //   name,
-    //   email,
-    //   password,
-    //   isAdm,
-    // });
 
     return res.json(user);
   } catch (error: any) {
@@ -87,6 +78,10 @@ export const listUsers = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
+
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -97,20 +92,23 @@ export const listUsers = async (req: Request, res: Response) => {
     const usersRepository = getRepository(User);
 
     const isValidAdm = await usersRepository.find({ isAdm: true });
-    // try {
-    jwt.verify(tokenItself, config.secret as string, (error, decoded: any) => {
-      for (let i = 0; i < isValidAdm.length; i++) {
-        if (isValidAdm[i].id === decoded.id) {
-          // return "";
-          // Coisas da listagem
-          const allUsers = usersRepository.find();
 
-          return allUsers;
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (error, decoded: any) => {
+        for (let i = 0; i < isValidAdm.length; i++) {
+          if (isValidAdm[i].id === decoded.id) {
+            // Coisas da listagem
+            const allUsers = await usersRepository.find();
+
+            return res.json(allUsers);
+          }
         }
-      }
 
-      throw new ErrorHandler("This user is not an administrator!", 401);
-    });
+        throw new ErrorHandler("This user is not an administrator!", 401);
+      }
+    );
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
