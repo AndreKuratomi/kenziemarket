@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
+import jwt from "jsonwebtoken";
 
+import config from "../config/jwt.config";
 import { User } from "../entities/User";
 import { Product } from "../entities/Product";
 import { Cart } from "../entities/Cart";
@@ -223,11 +225,11 @@ export const deleteCart = async (req: Request, res: Response) => {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas da listagem
             await cartRepository.delete(id);
-            if (!cart) {
-              throw new ErrorHandler("No cart found!", 404);
-            }
+            // if (!cart) {
+            //   throw new ErrorHandler("No cart found!", 404);
+            // }
 
-            return cart;
+            // return cart;
           }
         }
 

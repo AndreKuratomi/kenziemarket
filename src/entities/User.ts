@@ -51,7 +51,7 @@ export class User {
     this.name = name;
     this.email = email;
     this.password = password;
-    this.cart = cart;
+    // this.cart = cart;
     this.isAdm = isAdm;
   }
 }

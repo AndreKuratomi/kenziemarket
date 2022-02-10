@@ -3,6 +3,7 @@ import { getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 
+import config from "../config/jwt.config";
 import { User } from "../entities/User";
 import { Product } from "../entities/Product";
 import { Cart } from "../entities/Cart";
@@ -144,23 +145,30 @@ export const listOneUser = async (req: Request, res: Response) => {
   // Coisas de Admin
   const isValidAdm = await userRepository.find({ isAdm: true });
   // try {
-  jwt.verify(tokenItself, config.secret as string, (error, decoded: any) => {
-    for (let i = 0; i < isValidAdm.length; i++) {
-      if (isValidAdm[i].id === decoded.id) {
-        // return "";
-        // Coisas da listagem
+  jwt.verify(
+    tokenItself,
+    config.secret as string,
+    async (error, decoded: any) => {
+      for (let i = 0; i < isValidAdm.length; i++) {
+        if (isValidAdm[i].id === decoded.id) {
+          // return "";
+          // Coisas da listagem
+          const user = await userRepository.findOne({ id });
+
+          return user;
+        }
+      }
+
+      if (decoded.id === id) {
         const user = await userRepository.findOne({ id });
 
         return user;
+      } else if (decoded.id !== id) {
+        throw new ErrorHandler(
+          "Only admins may update non self-profiles!",
+          401
+        );
       }
     }
-
-    if (decoded.id === id) {
-      const user = await userRepository.findOne({ id });
-
-      return user;
-    } else if (decoded.id !== id) {
-      throw new ErrorHandler("Only admins may update non self-profiles!", 401);
-    }
-  });
+  );
 };
