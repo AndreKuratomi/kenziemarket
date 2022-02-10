@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
+import jwt from "jsonwebtoken";
+import * as bcrypt from "bcrypt";
 
 import { User } from "../entities/User";
 import { Product } from "../entities/Product";
