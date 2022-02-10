@@ -1,6 +1,8 @@
 import { Request, response, Response } from "express";
 import { getRepository } from "typeorm";
+import jwt from "jsonwebtoken";
 
+import config from "../config/jwt.config";
 import { User } from "../entities/User";
 import { Product } from "../entities/Product";
 import { Cart } from "../entities/Cart";

@@ -8,19 +8,7 @@ import { Sell } from "./Sell";
 // ISSO TUDO VAI PARA OS CONTROLLERS!
 
 // Relação 1:1 User - Cart
-const asyncFunctionUser = async () => {
-  const userRepository = getRepository(User);
-  const data = {
-    id: "asdasdfasdffasfasf",
-    name: "André",
-    email: "mail@mail.com",
-    password: "1234",
-    isAdm: true,
-    createdOn: "zxcv",
-  };
-  const user = userRepository.create(data);
-  await userRepository.save(user);
-};
+
 
 const asyncFunctionCart = async () => {
   const cartRepository = getRepository(Cart);
