@@ -128,11 +128,20 @@ export const listOneUser = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
+
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
       }
     });
+
+    const userId = await userRepository.findOne({ id });
+    if (!userId) {
+      throw new ErrorHandler("No user found!", 404);
+    }
 
     jwt.verify(
       tokenItself,
@@ -140,39 +149,33 @@ export const listOneUser = async (req: Request, res: Response) => {
       async (err, decoded: any) => {
         const tokenId = decoded.id;
         const userProfile = await userRepository.findOne({ id: tokenId });
-        if (!userProfile) {
-          throw new ErrorHandler("No user found!", 404);
-        }
+        console.log(userProfile);
       }
     );
 
     // Coisas de Admin
     const isValidAdm = await userRepository.find({ isAdm: true });
-    // try {
+
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
-            // return "";
-            // Coisas da listagem
-            const user = await userRepository.findOne({ id });
-
-            return user;
+            return res.json(userId);
           }
         }
 
         if (decoded.id === id) {
           const user = await userRepository.findOne({ id });
 
-          return user;
-        } else if (decoded.id !== id) {
-          throw new ErrorHandler(
-            "Only admins may update non self-profiles!",
-            401
-          );
+          return res.json(user);
         }
+        // POR QUE NÃO ESTÁ RETORNANDO????
+        // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
+        res
+          .status(400)
+          .json({ message: "Only admins may list non self-profiles!" });
       }
     );
   } catch (error: any) {
