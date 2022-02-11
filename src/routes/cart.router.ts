@@ -6,8 +6,8 @@ import {
   // listOneCart,
   // deleteCart,
 } from "../controllers/cart.controller";
-import { isTokenValid } from "../middlewares/tokenCheck.middlewares";
 
+import { isTokenValid } from "../middlewares/tokenCheck.middlewares";
 // import {} from "../middlewares/..."
 
 const route = Router();
