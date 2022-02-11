@@ -94,7 +94,7 @@ export const addToCart = async (req: Request, res: Response) => {
         cart?.products.push(object);
         // console.log(cart?.products);
         console.log(cart?.products);
-        await cartRepository.save(cart);
+        // await cartRepository.save(cart);
         return res.json({
           message: "Product succesfully added to your cart!",
           cart: cart,
