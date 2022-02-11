@@ -4,7 +4,7 @@ import {
   addToCart,
   listAllCarts,
   listOneCart,
-  // deleteCart,
+  deleteCart,
 } from "../controllers/cart.controller";
 
 // import {} from "../middlewares/..."
@@ -15,6 +15,6 @@ export const cartRouter = () => {
   route.post("", addToCart);
   route.get("", listAllCarts);
   route.get("/:id", listOneCart);
-  // route.delete("/:id/:product_id", deleteCart);
+  route.delete("/:id/:product_id", deleteCart);
   return route;
 };
