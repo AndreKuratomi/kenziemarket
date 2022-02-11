@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 import config from "../config/jwt.config";
+import { areHeadersEnabled } from "../services/token.service";
 import ErrorHandler from "../utils/errors";
 
 export const isTokenValid = (
@@ -11,11 +12,7 @@ export const isTokenValid = (
 ) => {
   const auth = req.headers.authorization;
 
-  if (auth === undefined) {
-    throw new ErrorHandler("Headers unabled!", 400);
-  }
-
-  const tokenItself = auth.split(" ")[1];
+  const tokenItself = areHeadersEnabled(auth);
 
   if (!tokenItself) {
     throw new ErrorHandler("No token found!", 404);
