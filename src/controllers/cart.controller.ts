@@ -150,7 +150,7 @@ export const listAllCarts = async (req: Request, res: Response) => {
 };
 
 export const listOneCart = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id, product_id } = req.params;
   const userRepository = getRepository(User);
   const cartRepository = getRepository(Cart);
 
@@ -162,6 +162,17 @@ export const listOneCart = async (req: Request, res: Response) => {
     //   throw new ErrorHandler("Id must be uuid!", 404);
     // }
 
+    // Tem usuário com este id?
+    const userProfile = await userRepository.findOne({ id: id });
+    if (!userProfile) {
+      throw new ErrorHandler("No user found!", 404);
+    }
+
+    // E tem este product_id no carrinho dele?
+    const cart = await cartRepository.findOne({ cartOwner: userProfile.name });
+    if (!cart) {
+      throw new ErrorHandler("No cart found!", 404);
+    }
     // Coisas de token
     const auth = req.headers.authorization;
 
@@ -231,10 +242,16 @@ export const listOneCart = async (req: Request, res: Response) => {
 };
 
 export const deleteCart = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
   try {
-    const { id } = req.params;
-    const userRepository = getRepository(User);
-    const cartRepository = getRepository(Cart);
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    // if (id.length !== 36) {
+    //   throw new ErrorHandler("Id must be uuid!", 404);
+    // }
 
     // Coisas de token
     const auth = req.headers.authorization;
@@ -275,11 +292,10 @@ export const deleteCart = async (req: Request, res: Response) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas da listagem
-            await cartRepository.delete(id);
+            // await cartRepository.delete(id);
             // if (!cart) {
             //   throw new ErrorHandler("No cart found!", 404);
             // }
-
             // return cart;
           }
         }
