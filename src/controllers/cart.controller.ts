@@ -134,11 +134,12 @@ export const listAllCarts = async (req: Request, res: Response) => {
             // Coisas do registro
             const allCarts = await cartRepository.find();
 
-            return allCarts;
+            return res.json(allCarts);
           }
         }
-
-        throw new ErrorHandler("This user is not an administrator!", 401);
+        // MAS POR QUE NÃO RETORNA???
+        // throw new ErrorHandler("This user is not an administrator!", 401);
+        res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
