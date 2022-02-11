@@ -6,12 +6,13 @@ import {
   listOneProduct,
 } from "../controllers/product.controller";
 
-// import {} from "../middlewares/..."
+import { isUserAdmn } from "../middlewares/admin.middlewares";
+import { isTokenValid } from "../middlewares/tokenCheck.middlewares";
 
 const route = Router();
 
 export const productRouter = () => {
-  route.post("", registerProduct);
+  route.post("", isTokenValid, isUserAdmn, registerProduct);
   route.get("", listAllProducts);
   route.get("/:id", listOneProduct);
   return route;

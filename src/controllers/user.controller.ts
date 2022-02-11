@@ -29,23 +29,15 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const newBody = { name, email, password, isAdm };
     const user = UserCustomRepository.create(newBody);
-    await UserCustomRepository.save(user);
-    console.log(user.id);
+    const newUser = await UserCustomRepository.save(user);
+    console.log(newUser);
+    const userCart = CartCustomRepository.create(newUser);
+    const newCart = await CartCustomRepository.save(userCart);
+    console.log(newCart);
 
-    const cartOwner = user.name;
-    const products = user.cart;
-
-    const cart = CartCustomRepository.create({ cartOwner, products });
-    console.log(cart.id);
-
-    // cart.id = user.id;
-    console.log(cart.user);
-    await CartCustomRepository.save(cart);
-    // COMO CRIAR UM CART A PARTIR DA CRIAÇÃO DO USUÁRIO???
-
-    return res.json({ user, cart });
+    return res.json({ newUser });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 

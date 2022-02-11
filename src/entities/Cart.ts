@@ -7,33 +7,29 @@ import {
   CreateDateColumn,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from "typeorm";
+
+import Product from "./Product";
+import Sell from "./Sell";
 
 @Entity("cart")
 class Cart {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column()
-  cartOwner: string;
-
-  @Column({ type: "text", array: true, default: [] })
-  products: object[];
-
   @CreateDateColumn()
   createdOn!: Date;
 
-  @OneToOne((type) => User)
+  @OneToOne((type) => User, (user) => user.cart)
   @JoinColumn()
   user!: User;
 
-  // @OneToMany((type) => Product, (product) => product.user)
-  // product!: Product[];
+  @OneToMany((type) => Product, (product) => product.cart)
+  product!: Product[];
 
-  constructor(cartOwner: string, products: object[]) {
-    this.cartOwner = cartOwner;
-    this.products = products;
-  }
+  // @OneToOne((type) => Sell, (sell) => sell.user)
+  // sell!: Sell;
 }
 
 export default Cart;
