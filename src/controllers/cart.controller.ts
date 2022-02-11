@@ -199,23 +199,24 @@ export const listOneCart = async (req: Request, res: Response) => {
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
+        const ownerId = await userRepository.findOne({ id: decoded.id });
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas da listagem
             const cart = await cartRepository.findOne({ id });
+            console.log(cart);
             if (!cart) {
               throw new ErrorHandler("No cart found!", 404);
             }
-
             return res.json(cart);
           }
         }
-
-        if (decoded.id === id) {
-          const cart = await cartRepository.findOne({ id });
-
-          return cart;
-        } else if (decoded.id !== id) {
+        const cart = await cartRepository.findOne({ id });
+        console.log(ownerId?.name);
+        console.log(cart?.cartOwner);
+        if (ownerId?.name === cart?.cartOwner) {
+          return res.json(cart);
+        } else if (ownerId?.name !== cart?.cartOwner) {
           // MAS POR QUE NÃO RETORNA???
           // throw new ErrorHandler("Only admins may check non self-carts!", 401);
           res
@@ -286,10 +287,14 @@ export const deleteCart = async (req: Request, res: Response) => {
         if (decoded.id === id) {
           await cartRepository.delete(id);
         } else if (decoded.id !== id) {
-          throw new ErrorHandler(
-            "Only admins or the own user may delete its cart!",
-            401
-          );
+          // POR QUE AQUI NÃO FUNCIONA?
+          // throw new ErrorHandler(
+          //   "Only admins or the own user may delete its cart!",
+          //   401
+          // );
+          res.status(401).json({
+            message: "Only admins or the own user may delete its cart!",
+          });
         }
       }
     );
