@@ -80,17 +80,17 @@ export const addToCart = async (req: Request, res: Response) => {
         const cart = await cartRepository.findOne({
           cartOwner: owner,
         });
-        console.log(cart);
         if (!cart) {
           // MAS POR QUE NÃO RETORNA???
           // throw new ErrorHandler("No cart found!", 404);
           res.status(404).json({ message: "No cart found!" });
         }
         cart?.products.push(doesAcquiredProductExist);
+        console.log(cart);
 
         return res.json({
           message: "Product succesfully added to your cart!",
-          cart: cart?.products,
+          cart: cart,
         });
       }
     );
@@ -132,8 +132,10 @@ export const listAllCarts = async (req: Request, res: Response) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas do registro
+            // const qwe = await cartRepository.findOne({ cartOwner: "André13" });
+            // console.log(qwe);
             const allCarts = await cartRepository.find();
-
+            // POR QUE NÃO RETORNA JÁ COM OS VALORES QUE EU INSERI NA FUNÇÃO ANTERIOR?
             return res.json(allCarts);
           }
         }
@@ -153,6 +155,13 @@ export const listOneCart = async (req: Request, res: Response) => {
   const cartRepository = getRepository(Cart);
 
   try {
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    // if (id.length !== 36) {
+    //   throw new ErrorHandler("Id must be uuid!", 404);
+    // }
+
     // Coisas de token
     const auth = req.headers.authorization;
 
@@ -185,6 +194,7 @@ export const listOneCart = async (req: Request, res: Response) => {
 
     const isValidAdm = await userRepository.find({ isAdm: true });
 
+    // Coisas de Admin
     jwt.verify(
       tokenItself,
       config.secret as string,
@@ -197,7 +207,7 @@ export const listOneCart = async (req: Request, res: Response) => {
               throw new ErrorHandler("No cart found!", 404);
             }
 
-            return cart;
+            return res.json(cart);
           }
         }
 
@@ -206,7 +216,11 @@ export const listOneCart = async (req: Request, res: Response) => {
 
           return cart;
         } else if (decoded.id !== id) {
-          throw new ErrorHandler("Only admins may check non self-carts!", 401);
+          // MAS POR QUE NÃO RETORNA???
+          // throw new ErrorHandler("Only admins may check non self-carts!", 401);
+          res
+            .status(401)
+            .json({ message: "Only admins may check non self-carts!" });
         }
       }
     );
