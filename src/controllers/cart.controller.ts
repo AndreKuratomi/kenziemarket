@@ -1,14 +1,35 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getCustomRepository, getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
 import config from "../config/jwt.config";
 import User from "../entities/User";
-import { Product } from "../entities/Product";
+import Product from "../entities/Product";
 import Cart from "../entities/Cart";
+import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
 
+// export const createCart = async (req: Request, res: Response) => {
+//   const CartCustomRepository = getCustomRepository(CartRepository);
+//   // const userRepository = getRepository(User);
+//   try {
+//     let { cartOwner, products } = req.body;
 
+//     const cartAlreadyExists = await CartCustomRepository.findOne({ cartOwner });
+
+//     if (cartAlreadyExists) {
+//       throw new ErrorHandler("Cart already registered!", 403);
+//     }
+
+//     const cart = CartCustomRepository.create({ cartOwner, products });
+
+//     await CartCustomRepository.save(cart);
+
+//     return res.json(cart);
+//   } catch (error: any) {
+//     res.status(error.statusCode).json({ message: error.message });
+//   }
+// };
 
 export const addToCart = async (req: Request, res: Response) => {
   const { id, name, type, price } = req.body;
@@ -16,7 +37,7 @@ export const addToCart = async (req: Request, res: Response) => {
   const userRepository = getRepository(User);
   const productRepository = getRepository(Product);
   const cartRepository = getRepository(Cart);
-  console.log(cartRepository.find());
+
   try {
     // Coisas de token
     const auth = req.headers.authorization;
@@ -54,16 +75,22 @@ export const addToCart = async (req: Request, res: Response) => {
           throw new ErrorHandler("No user found!", 404);
         }
 
-        const cart = await cartRepository.findOne({ user: tokenId });
+        const owner = userClient.name;
+
+        const cart = await cartRepository.findOne({
+          cartOwner: owner,
+        });
+        console.log(cart);
         if (!cart) {
-          throw new ErrorHandler("No cart found!", 404);
+          // MAS POR QUE NÃO RETORNA???
+          // throw new ErrorHandler("No cart found!", 404);
+          res.status(404).json({ message: "No cart found!" });
         }
-        cart.cartOwner = userClient.name;
-        cart.products.push(doesAcquiredProductExist);
+        cart?.products.push(doesAcquiredProductExist);
 
         return res.json({
           message: "Product succesfully added to your cart!",
-          cart: cart,
+          cart: cart?.products,
         });
       }
     );

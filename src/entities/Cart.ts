@@ -30,10 +30,9 @@ class Cart {
   // @OneToMany((type) => Product, (product) => product.user)
   // product!: Product[];
 
-  constructor(cartOwner: string, products: object[], totalPrice: number) {
+  constructor(cartOwner: string, products: object[]) {
     this.cartOwner = cartOwner;
     this.products = products;
-    // this.totalPrice = totalPrice;
   }
 }
 
