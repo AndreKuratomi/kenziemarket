@@ -4,18 +4,21 @@ import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 
 import config from "../config/jwt.config";
-import { User } from "../entities/User";
+import User from "../entities/User";
+import Cart from "../entities/Cart";
 import UserRepository from "../repository/user.repository";
+import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
 
 export const registerUser = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
+  const CartCustomRepository = getCustomRepository(CartRepository);
   // const userRepository = getRepository(User);
   try {
     let { name, email, password, isAdm } = req.body;
 
     const emailAlreadyExists = await UserCustomRepository.findOne({ email });
-
+    // emailAlreadyExists.
     if (emailAlreadyExists) {
       throw new ErrorHandler("Email already registered!", 403);
     }
@@ -24,14 +27,25 @@ export const registerUser = async (req: Request, res: Response) => {
     password = hashing;
 
     const newBody = { name, email, password, isAdm };
-
     const user = UserCustomRepository.create(newBody);
-
     await UserCustomRepository.save(user);
+    console.log(user.id);
 
-    return res.json(user);
+    const cartOwner = user.name;
+    const products = user.cart;
+
+    const cart = CartCustomRepository.create({ cartOwner, products });
+    console.log(cart.id);
+
+    // cart.id = user.id;
+    console.log(cart.user);
+    await CartCustomRepository.save(cart);
+    // COMO CRIAR UM CART A PARTIR DA CRIAÇÃO DO USUÁRIO???
+
+    return res.json({ user, cart });
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    console.log(error.statusCode);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -105,8 +119,9 @@ export const listUsers = async (req: Request, res: Response) => {
             return res.json(allUsers);
           }
         }
-
-        throw new ErrorHandler("This user is not an administrator!", 401);
+        // POR QUE NÃO ESTÁ RETORNANDO????
+        // throw new ErrorHandler("This user is not an administrator!", 401);
+        res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
@@ -119,6 +134,10 @@ export const listOneUser = async (req: Request, res: Response) => {
 
   const userRepository = getRepository(User);
   try {
+    if (id.length !== 36) {
+      throw new ErrorHandler("Id must be uuid!", 404);
+    }
+
     // Coisas de token
     const auth = req.headers.authorization;
 
@@ -160,6 +179,7 @@ export const listOneUser = async (req: Request, res: Response) => {
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
+        console.log(decoded.id);
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             return res.json(userId);
@@ -170,12 +190,13 @@ export const listOneUser = async (req: Request, res: Response) => {
           const user = await userRepository.findOne({ id });
 
           return res.json(user);
+        } else {
+          // POR QUE NÃO ESTÁ RETORNANDO????
+          // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
+          res
+            .status(400)
+            .json({ message: "Only admins may list non self-profiles!" });
         }
-        // POR QUE NÃO ESTÁ RETORNANDO????
-        // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
-        res
-          .status(400)
-          .json({ message: "Only admins may list non self-profiles!" });
       }
     );
   } catch (error: any) {

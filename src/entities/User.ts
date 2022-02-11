@@ -6,12 +6,12 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Cart } from "./Cart";
-import { Product } from "./Product";
-import { Sell } from "./Sell";
+
+import Cart from "./Cart";
+import Sell from "./Sell";
 
 @Entity("users")
-export class User {
+class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
@@ -24,9 +24,6 @@ export class User {
   @Column()
   password: string;
 
-  // @Column()
-  // cart: object[];
-
   @Column()
   isAdm: boolean;
 
@@ -34,7 +31,7 @@ export class User {
   createdOn!: Date;
 
   @OneToOne((type) => Cart, (cart) => cart.user)
-  cart!: Cart;
+  cart!: Cart[];
 
   // @OneToMany((type) => Product, (product) => product.user) products!: Product[];
 
@@ -55,3 +52,5 @@ export class User {
     this.isAdm = isAdm;
   }
 }
+
+export default User;
