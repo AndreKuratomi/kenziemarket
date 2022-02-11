@@ -28,8 +28,8 @@ class Cart {
   @OneToMany((type) => Product, (product) => product.cart)
   product!: Product[];
 
-  // @OneToOne((type) => Sell, (sell) => sell.user)
-  // sell!: Sell;
+  @OneToOne((type) => Sell, (sell) => sell.cart)
+  sell!: Sell;
 }
 
 export default Cart;

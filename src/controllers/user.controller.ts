@@ -28,16 +28,16 @@ export const registerUser = async (req: Request, res: Response) => {
     password = hashing;
 
     const newBody = { name, email, password, isAdm };
+
     const user = UserCustomRepository.create(newBody);
     const newUser = await UserCustomRepository.save(user);
-    console.log(newUser);
+
     const userCart = CartCustomRepository.create(newUser);
     const newCart = await CartCustomRepository.save(userCart);
-    console.log(newCart);
 
     return res.json({ newUser });
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res.status(error.statusCode).json({ message: error.message });
   }
 };
 
