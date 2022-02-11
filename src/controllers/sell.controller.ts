@@ -3,10 +3,10 @@ import { getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
 import config from "../config/jwt.config";
-import { User } from "../entities/User";
-import { Product } from "../entities/Product";
-import { Cart } from "../entities/Cart";
-import { Sell } from "../entities/Sell";
+import User from "../entities/User";
+import Product from "../entities/Product";
+import Cart from "../entities/Cart";
+import Sell from "../entities/Sell";
 import ErrorHandler from "../utils/errors";
 
 const userRepository = getRepository(User);
@@ -26,6 +26,9 @@ export const makeSell = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -89,6 +92,9 @@ export const listAllSells = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -132,6 +138,9 @@ export const listOneSell = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);

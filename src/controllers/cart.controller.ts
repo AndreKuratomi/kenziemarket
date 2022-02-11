@@ -1,15 +1,31 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getCustomRepository, getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
 import config from "../config/jwt.config";
-import { User } from "../entities/User";
-import { Product } from "../entities/Product";
-import { Cart } from "../entities/Cart";
+import User from "../entities/User";
+import Product from "../entities/Product";
+import Cart from "../entities/Cart";
+import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
 
 // export const createCart = async (req: Request, res: Response) => {
+//   const CartCustomRepository = getCustomRepository(CartRepository);
+//   // const userRepository = getRepository(User);
 //   try {
+//     let { cartOwner, products } = req.body;
+
+//     const cartAlreadyExists = await CartCustomRepository.findOne({ cartOwner });
+
+//     if (cartAlreadyExists) {
+//       throw new ErrorHandler("Cart already registered!", 403);
+//     }
+
+//     const cart = CartCustomRepository.create({ cartOwner, products });
+
+//     await CartCustomRepository.save(cart);
+
+//     return res.json(cart);
 //   } catch (error: any) {
 //     res.status(error.statusCode).json({ message: error.message });
 //   }
@@ -32,6 +48,10 @@ export const addToCart = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
+
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -40,8 +60,7 @@ export const addToCart = async (req: Request, res: Response) => {
 
     const id: string = req.body.id;
 
-    const doesAcquiredProductExist = await productRepository.findOne({ id });
-
+    const doesAcquiredProductExist = await productRepository.findOne(id);
     if (!doesAcquiredProductExist) {
       throw new ErrorHandler("No product found!", 404);
     }
@@ -56,12 +75,18 @@ export const addToCart = async (req: Request, res: Response) => {
           throw new ErrorHandler("No user found!", 404);
         }
 
-        const cart = await cartRepository.findOne({ userId: tokenId });
+        const owner = userClient.name;
+
+        const cart = await cartRepository.findOne({
+          cartOwner: owner,
+        });
         if (!cart) {
-          throw new ErrorHandler("No cart found!", 404);
+          // MAS POR QUE NÃO RETORNA???
+          // throw new ErrorHandler("No cart found!", 404);
+          res.status(404).json({ message: "No cart found!" });
         }
-        cart.cartOwner = userClient.name;
-        cart.products.push(doesAcquiredProductExist);
+        cart?.products.push(doesAcquiredProductExist);
+        console.log(cart);
 
         return res.json({
           message: "Product succesfully added to your cart!",
@@ -88,6 +113,9 @@ export const listAllCarts = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -104,13 +132,16 @@ export const listAllCarts = async (req: Request, res: Response) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas do registro
+            // const qwe = await cartRepository.findOne({ cartOwner: "André13" });
+            // console.log(qwe);
             const allCarts = await cartRepository.find();
-
-            return allCarts;
+            // POR QUE NÃO RETORNA JÁ COM OS VALORES QUE EU INSERI NA FUNÇÃO ANTERIOR?
+            return res.json(allCarts);
           }
         }
-
-        throw new ErrorHandler("This user is not an administrator!", 401);
+        // MAS POR QUE NÃO RETORNA???
+        // throw new ErrorHandler("This user is not an administrator!", 401);
+        res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
@@ -119,11 +150,29 @@ export const listAllCarts = async (req: Request, res: Response) => {
 };
 
 export const listOneCart = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id, product_id } = req.params;
   const userRepository = getRepository(User);
   const cartRepository = getRepository(Cart);
 
   try {
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    // if (id.length !== 36) {
+    //   throw new ErrorHandler("Id must be uuid!", 404);
+    // }
+
+    // Tem usuário com este id?
+    const userProfile = await userRepository.findOne({ id: id });
+    if (!userProfile) {
+      throw new ErrorHandler("No user found!", 404);
+    }
+
+    // E tem este product_id no carrinho dele?
+    const cart = await cartRepository.findOne({ cartOwner: userProfile.name });
+    if (!cart) {
+      throw new ErrorHandler("No cart found!", 404);
+    }
     // Coisas de token
     const auth = req.headers.authorization;
 
@@ -133,6 +182,9 @@ export const listOneCart = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -153,28 +205,34 @@ export const listOneCart = async (req: Request, res: Response) => {
 
     const isValidAdm = await userRepository.find({ isAdm: true });
 
+    // Coisas de Admin
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
+        const ownerId = await userRepository.findOne({ id: decoded.id });
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas da listagem
             const cart = await cartRepository.findOne({ id });
+            console.log(cart);
             if (!cart) {
               throw new ErrorHandler("No cart found!", 404);
             }
-
-            return cart;
+            return res.json(cart);
           }
         }
-
-        if (decoded.id === id) {
-          const cart = await cartRepository.findOne({ id });
-
-          return cart;
-        } else if (decoded.id !== id) {
-          throw new ErrorHandler("Only admins may check non self-carts!", 401);
+        const cart = await cartRepository.findOne({ id });
+        console.log(ownerId?.name);
+        console.log(cart?.cartOwner);
+        if (ownerId?.name === cart?.cartOwner) {
+          return res.json(cart);
+        } else if (ownerId?.name !== cart?.cartOwner) {
+          // MAS POR QUE NÃO RETORNA???
+          // throw new ErrorHandler("Only admins may check non self-carts!", 401);
+          res
+            .status(401)
+            .json({ message: "Only admins may check non self-carts!" });
         }
       }
     );
@@ -184,10 +242,16 @@ export const listOneCart = async (req: Request, res: Response) => {
 };
 
 export const deleteCart = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
   try {
-    const { id } = req.params;
-    const userRepository = getRepository(User);
-    const cartRepository = getRepository(Cart);
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    // if (id.length !== 36) {
+    //   throw new ErrorHandler("Id must be uuid!", 404);
+    // }
 
     // Coisas de token
     const auth = req.headers.authorization;
@@ -198,6 +262,9 @@ export const deleteCart = async (req: Request, res: Response) => {
 
     const tokenItself = auth.split(" ")[1];
 
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
         throw new ErrorHandler("Invalid token!", 401);
@@ -225,11 +292,10 @@ export const deleteCart = async (req: Request, res: Response) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas da listagem
-            await cartRepository.delete(id);
+            // await cartRepository.delete(id);
             // if (!cart) {
             //   throw new ErrorHandler("No cart found!", 404);
             // }
-
             // return cart;
           }
         }
@@ -237,10 +303,14 @@ export const deleteCart = async (req: Request, res: Response) => {
         if (decoded.id === id) {
           await cartRepository.delete(id);
         } else if (decoded.id !== id) {
-          throw new ErrorHandler(
-            "Only admins or the own user may delete its cart!",
-            401
-          );
+          // POR QUE AQUI NÃO FUNCIONA?
+          // throw new ErrorHandler(
+          //   "Only admins or the own user may delete its cart!",
+          //   401
+          // );
+          res.status(401).json({
+            message: "Only admins or the own user may delete its cart!",
+          });
         }
       }
     );

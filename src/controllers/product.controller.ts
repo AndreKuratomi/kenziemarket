@@ -1,19 +1,27 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getCustomRepository, getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
 import config from "../config/jwt.config";
-import { Product } from "../entities/Product";
-import { User } from "../entities/User";
+import Product from "../entities/Product";
+import User from "../entities/User";
 import ErrorHandler from "../utils/errors";
+import ProductRepository from "../repository/product.repository";
 
 export const registerProduct = async (req: Request, res: Response) => {
   const { name, type, price } = req.body;
 
+  const ProductCustomRepository = getCustomRepository(ProductRepository);
   const productRepository = getRepository(Product);
   const userRepository = getRepository(User);
 
   try {
+    const productAlreadyExists = await productRepository.findOne({ name });
+
+    if (productAlreadyExists) {
+      throw new ErrorHandler("Product already registered!", 403);
+    }
+
     // Coisas de token
     const auth = req.headers.authorization;
 
@@ -22,6 +30,10 @@ export const registerProduct = async (req: Request, res: Response) => {
     }
 
     const tokenItself = auth.split(" ")[1];
+
+    if (!tokenItself) {
+      throw new ErrorHandler("No token found!", 404);
+    }
 
     jwt.verify(tokenItself, config.secret as string, (err: any) => {
       if (err) {
@@ -32,7 +44,7 @@ export const registerProduct = async (req: Request, res: Response) => {
     // Coisas de Admin
 
     const isValidAdm = await userRepository.find({ isAdm: true });
-    // try {
+
     jwt.verify(
       tokenItself,
       config.secret as string,
@@ -40,14 +52,20 @@ export const registerProduct = async (req: Request, res: Response) => {
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             // Coisas do registro
-            const newProduct = productRepository.create({ name, type, price });
 
-            await productRepository.save(newProduct);
-            res.send(newProduct);
+            const newProduct = ProductCustomRepository.create({
+              name,
+              type,
+              price,
+            });
+
+            await ProductCustomRepository.save(newProduct);
+            return res.json(newProduct);
           }
         }
-
-        throw new ErrorHandler("This user is not an administrator!", 401);
+        // POR QUE NÃO ESTÁ RETORNANDO????
+        // throw new ErrorHandler("This user is not an administrator!", 401);
+        res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
@@ -59,9 +77,9 @@ export const listAllProducts = async (req: Request, res: Response) => {
   const productRepository = getRepository(Product);
 
   try {
-    const allProducts = productRepository.find();
+    const allProducts = await productRepository.find();
 
-    return allProducts;
+    return res.json(allProducts);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
@@ -69,16 +87,24 @@ export const listAllProducts = async (req: Request, res: Response) => {
 
 export const listOneProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
+
   const productRepository = getRepository(Product);
 
   try {
-    const product = productRepository.findOne({ id });
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    // if (id.length !== 36) {
+    //   throw new ErrorHandler("Id must be uuid!", 404);
+    // }
+
+    const product = await productRepository.findOne({ id });
     if (!product) {
-      throw new ErrorHandler("No user found!", 404);
+      throw new ErrorHandler("No product found!", 404);
     }
 
-    return product;
+    return res.json(product);
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    res.status(456).json({ message: error.message });
   }
 };

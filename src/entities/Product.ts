@@ -6,13 +6,13 @@ import {
   ManyToOne,
   JoinTable,
 } from "typeorm";
-import { Cart } from "./Cart";
 
-import { User } from "./User";
+import Cart from "./Cart";
+import User from "./User";
 
 @Entity("products")
-export class Product {
-  @PrimaryGeneratedColumn()
+class Product {
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column()
@@ -36,3 +36,5 @@ export class Product {
     this.price = price;
   }
 }
+
+export default Product;
