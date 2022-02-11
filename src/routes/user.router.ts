@@ -7,14 +7,14 @@ import {
   listOneUser,
 } from "../controllers/user.controller";
 
-// import {} from "../middlewares/..."
+import { isTokenValid } from "../middlewares/tokenCheck.middlewares";
 
 const route = Router();
 
 export const userRouter = () => {
   route.post("", registerUser);
   route.post("/login", loginUser);
-  route.get("", listUsers);
-  route.get("/:id", listOneUser);
+  route.get("", isTokenValid, listUsers);
+  route.get("/:id", isTokenValid, listOneUser);
   return route;
 };
