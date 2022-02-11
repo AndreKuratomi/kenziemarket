@@ -31,7 +31,7 @@ class User {
   createdOn!: Date;
 
   @OneToOne((type) => Cart, (cart) => cart.user)
-  cart!: Cart[];
+  cart!: Cart;
 
   // @OneToMany((type) => Product, (product) => product.user) products!: Product[];
 

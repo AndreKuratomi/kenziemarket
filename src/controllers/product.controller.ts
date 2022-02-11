@@ -22,52 +22,15 @@ export const registerProduct = async (req: Request, res: Response) => {
       throw new ErrorHandler("Product already registered!", 403);
     }
 
-    // Coisas de token
-    const auth = req.headers.authorization;
-
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
+    const newProduct = ProductCustomRepository.create({
+      name,
+      type,
+      price,
     });
 
-    // Coisas de Admin
+    await ProductCustomRepository.save(newProduct);
 
-    const isValidAdm = await userRepository.find({ isAdm: true });
-
-    jwt.verify(
-      tokenItself,
-      config.secret as string,
-      async (error, decoded: any) => {
-        for (let i = 0; i < isValidAdm.length; i++) {
-          if (isValidAdm[i].id === decoded.id) {
-            // Coisas do registro
-
-            const newProduct = ProductCustomRepository.create({
-              name,
-              type,
-              price,
-            });
-
-            await ProductCustomRepository.save(newProduct);
-            return res.json(newProduct);
-          }
-        }
-        // POR QUE NÃO ESTÁ RETORNANDO????
-        // throw new ErrorHandler("This user is not an administrator!", 401);
-        res.status(401).json({ message: "This user is not an administrator!" });
-      }
-    );
+    return res.json(newProduct);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
