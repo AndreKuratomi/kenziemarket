@@ -29,9 +29,6 @@ export const registerProduct = async (req: Request, res: Response) => {
     });
     const newProduct = await ProductCustomRepository.save(product);
 
-    const productCart = CartCustomRepository.create(newProduct);
-    const newCart = await CartCustomRepository.save(productCart);
-
     return res.json(product);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });

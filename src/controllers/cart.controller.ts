@@ -28,8 +28,6 @@ export const addToCart = async (req: Request, res: Response) => {
       throw new ErrorHandler("No product found!", 404);
     }
 
-    const { ...object } = doesAcquiredProductExist;
-
     jwt.verify(
       tokenItself,
       config.secret as string,
@@ -48,10 +46,8 @@ export const addToCart = async (req: Request, res: Response) => {
           where: { id: tokenId },
           relations: ["product"], //especifica para este caso
         });
-        console.log(cart);
+
         const product = await productRepository.findOne({ id: id });
-        // console.log(cart.p);
-        // console.log(products);
 
         if (!cart) {
           // MAS POR QUE NÃO RETORNA???
