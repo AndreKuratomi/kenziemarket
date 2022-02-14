@@ -4,7 +4,7 @@ import {
   addToCart,
   listAllCarts,
   listOneCart,
-  // deleteCart,
+  deleteFromCart,
 } from "../controllers/cart.controller";
 
 import { isTokenValid } from "../middlewares/tokenCheck.middlewares";
@@ -16,6 +16,6 @@ export const cartRouter = () => {
   route.post("", isTokenValid, addToCart);
   route.get("", isTokenValid, isUserAdmn, listAllCarts);
   route.get("/:id", isTokenValid, listOneCart);
-  // route.delete("/:id/:product_id", isTokenValid, deleteCart);
+  route.delete("/:id/:product_id", isTokenValid, deleteFromCart);
   return route;
 };

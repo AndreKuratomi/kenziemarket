@@ -47,8 +47,6 @@ export const addToCart = async (req: Request, res: Response) => {
           relations: ["product"], //especifica para este caso
         });
 
-        const product = await productRepository.findOne({ id: id });
-
         if (!cart) {
           // MAS POR QUE NÃO RETORNA???
           // throw new ErrorHandler("No cart found!", 404);
@@ -140,106 +138,100 @@ export const listOneCart = async (req: Request, res: Response) => {
   }
 };
 
-// export const deleteCart = async (req: Request, res: Response) => {
-//   const { id } = req.params;
-//   const userRepository = getRepository(User);
-//   const cartRepository = getRepository(Cart);
-//   try {
-//     if (!id) {
-//       throw new ErrorHandler("No id found!", 404);
-//     }
-//     // if (id.length !== 36) {
-//     //   throw new ErrorHandler("Id must be uuid!", 404);
-//     // }
+export const deleteFromCart = async (req: Request, res: Response) => {
+  const { id, product_id } = req.params;
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
+  try {
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    if (id.length !== 36) {
+      throw new ErrorHandler("Id must be uuid!", 404);
+    }
 
-//     // Tem usuário com este id?
-//     const userProfile = await userRepository.findOne({ id: id });
-//     if (!userProfile) {
-//       throw new ErrorHandler("No user found!", 404);
-//     }
+    // Tem usuário com este id?
+    const [user] = await userRepository.find({ where: { id: id } });
+    if (!user) {
+      throw new ErrorHandler("No user found!", 404);
+    }
 
-//     // E tem este product_id no carrinho dele?
-//     const cart = await cartRepository.findOne({});
-//     if (!cart) {
-//       throw new ErrorHandler("No cart found!", 404);
-//     }
+    const [cart] = await cartRepository.find({
+      where: { id: id },
+      relations: ["product"],
+    });
+    if (!cart) {
+      throw new ErrorHandler("No cart found!", 404);
+    }
 
-//     // Coisas de token
-//     const auth = req.headers.authorization;
+    // Coisas de token
+    const auth = req.headers.authorization;
 
-//     if (auth === undefined) {
-//       throw new ErrorHandler("Headers unabled!", 400);
-//     }
+    const tokenItself = areHeadersEnabled(auth);
 
-//     const tokenItself = auth.split(" ")[1];
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (err, decoded: any) => {
+        const tokenId = decoded.id;
 
-//     if (!tokenItself) {
-//       throw new ErrorHandler("No token found!", 404);
-//     }
-//     jwt.verify(tokenItself, config.secret as string, (err: any) => {
-//       if (err) {
-//         throw new ErrorHandler("Invalid token!", 401);
-//       }
-//     });
+        const userProfile = await userRepository.find({
+          where: { id: tokenId },
+        });
+        if (!userProfile) {
+          throw new ErrorHandler("No user found!", 404);
+        }
 
-//     jwt.verify(
-//       tokenItself,
-//       config.secret as string,
-//       async (err, decoded: any) => {
-//         const tokenId = decoded.id;
-//         const userProfile = await userRepository.findOne({ id: tokenId });
-//         if (!userProfile) {
-//           throw new ErrorHandler("No user found!", 404);
-//         }
-//       }
-//     );
+        if (userProfile[0].isAdm) {
+          let cartProducts = cart.product;
+          // E tem este product_id no carrinho dele?
+          for (let i = 0; i < cartProducts.length; i++) {
+            if (cartProducts[i].id === product_id) {
+              const newCart = cartProducts.filter(
+                (elt) => elt.id !== product_id
+              );
 
-//     const isValidAdm = await userRepository.find({ isAdm: true });
+              cartProducts = newCart;
 
-//     jwt.verify(
-//       tokenItself,
-//       config.secret as string,
-//       async (error, decoded: any) => {
-//         for (let i = 0; i < isValidAdm.length; i++) {
-//           if (isValidAdm[i].id === decoded.id) {
-//             const cartProducts = cart.product;
-//             for (let i = 0; i < cartProducts.length; i++) {
-//               // console.log(cartProducts[i]);
-//               // if (cartProducts[i].id === id) {
-//               //   cartProducts.filter((elt) => elt.id !== id);
-//               //   return res.json({
-//               //     message: `Product ${cartProducts[i].id} deleted from cart`,
-//               //   });
-//               // }
-//             }
-//             throw new ErrorHandler("No product found!", 404);
-//           }
-//         }
-//         // tenho que ver se o id do param coincide com o id do token e se sim se este token tem dentro de si o id do produto
+              // REMOVEU MAS NÃO ATUALIZOU
+              await cartRepository.save(cart);
+              console.log(cart);
 
-//         if (cart) {
-//           const cartProducts = cart.product;
-//           for (let i = 0; i < cartProducts.length; i++) {
-//             // if (cartProducts[i].id === id) {
-//             //   cartProducts.filter((elt) => elt.id !== id);
-//             //   return res.json({
-//             //     message: `Product ${cartProducts[i].id} deleted from cart`,
-//             //   });
-//             // }
-//           }
-//         } else {
-//           // POR QUE AQUI NÃO FUNCIONA?
-//           // throw new ErrorHandler(
-//           //   "Only admins or the own user may delete its cart!",
-//           //   401
-//           // );
-//           res.status(401).json({
-//             message: "Only admins or the own user may delete its product cart!",
-//           });
-//         }
-//       }
-//     );
-//   } catch (error: any) {
-//     res.status(error.statusCode).json({ message: error.message });
-//   }
-// };
+              return res.json({
+                message: `Product ${cartProducts[i].name} deleted from cart of client ${user.name}.`,
+              });
+            }
+          }
+          throw new ErrorHandler("No product found!", 404);
+        }
+
+        if (userProfile[0].id === cart.id) {
+          const cartProducts = cart.product;
+          for (let i = 0; i < cartProducts.length; i++) {
+            if (cartProducts[i].id === product_id) {
+              cartProducts.filter((elt) => elt.id !== product_id);
+
+              await cartRepository.save(cart);
+
+              return res.json({
+                message: `Product ${cartProducts[i].name} deleted from cart of client ${user.name}.`,
+              });
+            }
+          }
+          throw new ErrorHandler("No product found!", 404);
+        } else {
+          // POR QUE AQUI NÃO FUNCIONA?
+          // throw new ErrorHandler(
+          //   "Only admins or the own user may delete its cart!",
+          //   401
+          // );
+          res.status(401).json({
+            message: "Only admins or the own user may delete its product cart!",
+          });
+        }
+      }
+    );
+  } catch (error: any) {
+    res.status(error.statusCode).json({ message: error.message });
+  }
+};
