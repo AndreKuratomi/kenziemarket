@@ -25,7 +25,11 @@ class Cart {
   @JoinColumn()
   user!: User;
 
-  @OneToMany((type) => Product, (product) => product.cart)
+  @OneToMany(
+    (type) => Product,
+    (product) => product.cart
+    // , { eager: true } -> generaliza!
+  )
   product!: Product[];
 
   // @OneToOne((type) => Sell, (sell) => sell.cart)

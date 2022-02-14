@@ -42,10 +42,13 @@ export const addToCart = async (req: Request, res: Response) => {
 
         const owner = userClient.id;
         console.log(userClient.cart);
-        const cart = await cartRepository.findOne({
-          id: tokenId,
+        // const [cart] = await cartRepository.find({ //outra maneira de escrever
+        //[] denota que va ipegar o primeiro índice
+        const cart = await cartRepository.find({
+          where: { id: tokenId },
+          relations: ["product"], //especifica para este caso
         });
-
+        console.log(cart);
         const product = await productRepository.findOne({ id: id });
         // console.log(cart.p);
         // console.log(products);
@@ -56,7 +59,10 @@ export const addToCart = async (req: Request, res: Response) => {
           res.status(404).json({ message: "No cart found!" });
         }
 
-        cart?.product.push(doesAcquiredProductExist);
+        // cart.product.push(doesAcquiredProductExist); //já está como primeiro elemento
+        cart[0].product.push(doesAcquiredProductExist); //aqui delimitei
+
+        const newCart = await cartRepository.save(cart);
 
         return res.json({
           message: "Product succesfully added to your cart!",
