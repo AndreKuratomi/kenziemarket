@@ -3,7 +3,7 @@ import { Router } from "express";
 import {
   addToCart,
   listAllCarts,
-  // listOneCart,
+  listOneCart,
   // deleteCart,
 } from "../controllers/cart.controller";
 
@@ -15,7 +15,7 @@ const route = Router();
 export const cartRouter = () => {
   route.post("", isTokenValid, addToCart);
   route.get("", isTokenValid, isUserAdmn, listAllCarts);
-  // route.get("/:id", isTokenValid, listOneCart);
+  route.get("/:id", isTokenValid, listOneCart);
   // route.delete("/:id/:product_id", isTokenValid, deleteCart);
   return route;
 };

@@ -72,7 +72,6 @@ export const addToCart = async (req: Request, res: Response) => {
 };
 
 export const listAllCarts = async (req: Request, res: Response) => {
-  const userRepository = getRepository(User);
   const cartRepository = getRepository(Cart);
 
   try {
@@ -86,72 +85,60 @@ export const listAllCarts = async (req: Request, res: Response) => {
   }
 };
 
-// export const listOneCart = async (req: Request, res: Response) => {
-//   const { id, product_id } = req.params;
-//   const userRepository = getRepository(User);
-//   const cartRepository = getRepository(Cart);
+export const listOneCart = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
 
-//   try {
-//     if (!id) {
-//       throw new ErrorHandler("No id found!", 404);
-//     }
-//     // if (id.length !== 36) {
-//     //   throw new ErrorHandler("Id must be uuid!", 404);
-//     // }
+  try {
+    if (!id) {
+      throw new ErrorHandler("No id found!", 404);
+    }
+    if (id.length !== 36) {
+      throw new ErrorHandler("Id must be uuid!", 404);
+    }
 
-//     const auth = req.headers.authorization;
+    const auth = req.headers.authorization;
 
-//     const tokenItself = areHeadersEnabled(auth);
+    const tokenItself = areHeadersEnabled(auth);
 
-//     jwt.verify(
-//       tokenItself,
-//       config.secret as string,
-//       async (err, decoded: any) => {
-//         const tokenId = decoded.id;
-//         const userProfile = await userRepository.findOne({ id: tokenId });
-//         if (!userProfile) {
-//           throw new ErrorHandler("No user found!", 404);
-//         }
-//       }
-//     );
+    jwt.verify(
+      tokenItself,
+      config.secret as string,
+      async (err, decoded: any) => {
+        const tokenId = decoded.id;
+        const [userProfile] = await userRepository.find({
+          where: { id: tokenId },
+        });
+        if (!userProfile) {
+          throw new ErrorHandler("No user found!", 404);
+        }
 
-//     const isValidAdm = await userRepository.find({ isAdm: true });
+        const [cart] = await cartRepository.find({
+          where: { id: tokenId },
+          relations: ["product"],
+        });
+        if (!cart) {
+          throw new ErrorHandler("No cart found!", 404);
+        }
 
-//     // Coisas de Admin
-//     jwt.verify(
-//       tokenItself,
-//       config.secret as string,
-//       async (error, decoded: any) => {
-//         const ownerId = await userRepository.findOne({ id: decoded.id });
-//         for (let i = 0; i < isValidAdm.length; i++) {
-//           if (isValidAdm[i].id === decoded.id) {
-//             // Coisas da listagem
-//             const cart = await cartRepository.findOne({ id });
-//             console.log(cart);
-//             if (!cart) {
-//               throw new ErrorHandler("No cart found!", 404);
-//             }
-//             return res.json(cart);
-//           }
-//         }
-//         const cart = await cartRepository.findOne({ id });
-//         console.log(ownerId?.name);
-//         console.log(cart?.cartOwner);
-//         if (ownerId?.name === cart?.cartOwner) {
-//           return res.json(cart);
-//         } else if (ownerId?.name !== cart?.cartOwner) {
-//           // MAS POR QUE NÃO RETORNA???
-//           // throw new ErrorHandler("Only admins may check non self-carts!", 401);
-//           res
-//             .status(401)
-//             .json({ message: "Only admins may check non self-carts!" });
-//         }
-//       }
-//     );
-//   } catch (error: any) {
-//     res.status(error.statusCode).json({ message: error.message });
-//   }
-// };
+        if (userProfile.isAdm) {
+          return res.json(cart);
+        } else if (userProfile.id === id) {
+          return res.json(cart);
+        } else {
+          // MAS POR QUE NÃO RETORNA???
+          // throw new ErrorHandler("Only admins may check non self-carts!", 401);
+          res
+            .status(401)
+            .json({ message: "Only admins may check non self-carts!" });
+        }
+      }
+    );
+  } catch (error: any) {
+    res.status(error.statusCode).json({ message: error.message });
+  }
+};
 
 // export const deleteCart = async (req: Request, res: Response) => {
 //   const { id } = req.params;
