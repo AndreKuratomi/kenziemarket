@@ -10,28 +10,6 @@ import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
 import { areHeadersEnabled } from "../services/token.service";
 
-// export const createCart = async (req: Request, res: Response) => {
-//   const CartCustomRepository = getCustomRepository(CartRepository);
-//   // const userRepository = getRepository(User);
-//   try {
-//     let { cartOwner, products } = req.body;
-
-//     const cartAlreadyExists = await CartCustomRepository.findOne({ cartOwner });
-
-//     if (cartAlreadyExists) {
-//       throw new ErrorHandler("Cart already registered!", 403);
-//     }
-
-//     const cart = CartCustomRepository.create({ cartOwner, products });
-
-//     await CartCustomRepository.save(cart);
-
-//     return res.json(cart);
-//   } catch (error: any) {
-//     res.status(error.statusCode).json({ message: error.message });
-//   }
-// };
-
 export const addToCart = async (req: Request, res: Response) => {
   const { id, name, type, price } = req.body;
 
@@ -49,10 +27,9 @@ export const addToCart = async (req: Request, res: Response) => {
     if (!doesAcquiredProductExist) {
       throw new ErrorHandler("No product found!", 404);
     }
-    const { ...object } = doesAcquiredProductExist;
-    // console.log(object);
 
-    // let arr: object[] = [];
+    const { ...object } = doesAcquiredProductExist;
+
     jwt.verify(
       tokenItself,
       config.secret as string,
@@ -63,23 +40,24 @@ export const addToCart = async (req: Request, res: Response) => {
           throw new ErrorHandler("No user found!", 404);
         }
 
-        const owner = userClient.name;
-
+        const owner = userClient.id;
+        console.log(userClient.cart);
         const cart = await cartRepository.findOne({
-          // cartOwner: owner,
+          id: tokenId,
         });
-        console.log(cart);
+
+        const product = await productRepository.findOne({ id: id });
+        // console.log(cart.p);
+        // console.log(products);
+
         if (!cart) {
           // MAS POR QUE NÃO RETORNA???
           // throw new ErrorHandler("No cart found!", 404);
           res.status(404).json({ message: "No cart found!" });
         }
-        // arr.push(object);
-        // console.log(arr);
-        cart?.product.push(object);
-        // console.log(cart?.product);
-        console.log(cart?.product);
-        // await cartRepository.save(cart);
+
+        cart?.product.push(doesAcquiredProductExist);
+
         return res.json({
           message: "Product succesfully added to your cart!",
           cart: cart,
@@ -87,7 +65,7 @@ export const addToCart = async (req: Request, res: Response) => {
       }
     );
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -96,30 +74,9 @@ export const listAllCarts = async (req: Request, res: Response) => {
   const cartRepository = getRepository(Cart);
 
   try {
-    // Coisas de Admin
-    const isValidAdm = await userRepository.find({ isAdm: true });
-    const auth = req.headers.authorization;
+    const allCarts = await cartRepository.find();
 
-    const tokenItself = areHeadersEnabled(auth);
-    jwt.verify(
-      tokenItself,
-      config.secret as string,
-      async (error, decoded: any) => {
-        for (let i = 0; i < isValidAdm.length; i++) {
-          if (isValidAdm[i].id === decoded.id) {
-            // Coisas do registro
-            // const qwe = await cartRepository.findOne({ cartOwner: "André13" });
-            // console.log(qwe);
-            const allCarts = await cartRepository.find();
-            // POR QUE NÃO RETORNA JÁ COM OS VALORES QUE EU INSERI NA FUNÇÃO ANTERIOR?
-            return res.json(allCarts);
-          }
-        }
-        // MAS POR QUE NÃO RETORNA???
-        // throw new ErrorHandler("This user is not an administrator!", 401);
-        res.status(401).json({ message: "This user is not an administrator!" });
-      }
-    );
+    return res.json(allCarts);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }

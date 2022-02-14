@@ -28,10 +28,9 @@ export const registerProduct = async (req: Request, res: Response) => {
       price,
     });
     const newProduct = await ProductCustomRepository.save(product);
-    console.log(newProduct);
+
     const productCart = CartCustomRepository.create(newProduct);
     const newCart = await CartCustomRepository.save(productCart);
-    console.log(newCart);
 
     return res.json(product);
   } catch (error: any) {
@@ -60,9 +59,9 @@ export const listOneProduct = async (req: Request, res: Response) => {
     if (!id) {
       throw new ErrorHandler("No id found!", 404);
     }
-    // if (id.length !== 36) {
-    //   throw new ErrorHandler("Id must be uuid!", 404);
-    // }
+    if (id.length !== 36) {
+      throw new ErrorHandler("Id must be uuid!", 404);
+    }
 
     const product = await productRepository.findOne({ id });
     if (!product) {
