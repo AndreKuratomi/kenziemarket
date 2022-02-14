@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { getCustomRepository, getRepository } from "typeorm";
-import jwt from "jsonwebtoken";
 
-import config from "../config/jwt.config";
 import Product from "../entities/Product";
 import User from "../entities/User";
 import ErrorHandler from "../utils/errors";
 import ProductRepository from "../repository/product.repository";
+import CartRepository from "../repository/cart.repository";
 
 export const registerProduct = async (req: Request, res: Response) => {
   const { name, type, price } = req.body;
 
   const ProductCustomRepository = getCustomRepository(ProductRepository);
   const productRepository = getRepository(Product);
-  const userRepository = getRepository(User);
+
+  const CartCustomRepository = getCustomRepository(CartRepository);
 
   try {
     const productAlreadyExists = await productRepository.findOne({ name });
@@ -22,15 +22,18 @@ export const registerProduct = async (req: Request, res: Response) => {
       throw new ErrorHandler("Product already registered!", 403);
     }
 
-    const newProduct = ProductCustomRepository.create({
+    const product = ProductCustomRepository.create({
       name,
       type,
       price,
     });
+    const newProduct = await ProductCustomRepository.save(product);
+    console.log(newProduct);
+    const productCart = CartCustomRepository.create(newProduct);
+    const newCart = await CartCustomRepository.save(productCart);
+    console.log(newCart);
 
-    await ProductCustomRepository.save(newProduct);
-
-    return res.json(newProduct);
+    return res.json(product);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
