@@ -76,7 +76,9 @@ export const listAllCarts = async (req: Request, res: Response) => {
   const cartRepository = getRepository(Cart);
 
   try {
-    const allCarts = await cartRepository.find();
+    const allCarts = await cartRepository.find({
+      relations: ["product"],
+    });
 
     return res.json(allCarts);
   } catch (error: any) {
