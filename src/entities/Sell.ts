@@ -32,8 +32,8 @@ class Sell {
   @JoinColumn()
   cart!: Cart;
 
-  @ManyToOne((type) => User, (user) => user.sells)
-  user!: User;
+  // @ManyToOne((type) => User, (user) => user.sells)
+  // user!: User;
 
   constructor(clientName: string, clientEmail: string, totalPrice: number) {
     this.clientName = clientName;
