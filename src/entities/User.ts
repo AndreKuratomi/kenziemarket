@@ -31,24 +31,15 @@ class User {
   createdOn!: Date;
 
   @OneToOne((type) => Cart, (cart) => cart.user)
-  cart!: Cart[];
-
-  // @OneToMany((type) => Product, (product) => product.user) products!: Product[];
+  cart!: Cart;
 
   @OneToMany((type) => Sell, (sell) => sell.user)
   sells!: Sell[];
 
-  constructor(
-    name: string,
-    email: string,
-    password: string,
-    // cart: object[],
-    isAdm: boolean
-  ) {
+  constructor(name: string, email: string, password: string, isAdm: boolean) {
     this.name = name;
     this.email = email;
     this.password = password;
-    // this.cart = cart;
     this.isAdm = isAdm;
   }
 }

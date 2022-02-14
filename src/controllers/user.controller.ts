@@ -9,16 +9,17 @@ import Cart from "../entities/Cart";
 import UserRepository from "../repository/user.repository";
 import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
+import { areHeadersEnabled } from "../services/token.service";
 
 export const registerUser = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
   const CartCustomRepository = getCustomRepository(CartRepository);
-  // const userRepository = getRepository(User);
+
   try {
     let { name, email, password, isAdm } = req.body;
 
     const emailAlreadyExists = await UserCustomRepository.findOne({ email });
-    // emailAlreadyExists.
+
     if (emailAlreadyExists) {
       throw new ErrorHandler("Email already registered!", 403);
     }
@@ -27,25 +28,16 @@ export const registerUser = async (req: Request, res: Response) => {
     password = hashing;
 
     const newBody = { name, email, password, isAdm };
+
     const user = UserCustomRepository.create(newBody);
-    await UserCustomRepository.save(user);
-    console.log(user.id);
+    const newUser = await UserCustomRepository.save(user);
 
-    const cartOwner = user.name;
-    const products = user.cart;
+    const userCart = CartCustomRepository.create(newUser);
+    const newCart = await CartCustomRepository.save(userCart);
 
-    const cart = CartCustomRepository.create({ cartOwner, products });
-    console.log(cart.id);
-
-    // cart.id = user.id;
-    console.log(cart.user);
-    await CartCustomRepository.save(cart);
-    // COMO CRIAR UM CART A PARTIR DA CRIAÇÃO DO USUÁRIO???
-
-    return res.json({ user, cart });
+    return res.json({ newUser });
   } catch (error: any) {
-    console.log(error.statusCode);
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode).json({ message: error.message });
   }
 };
 
@@ -83,47 +75,10 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
-    // Coisas de token
-    const auth = req.headers.authorization;
-
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
-
-    // Coisas de Admin
     const usersRepository = getRepository(User);
 
-    const isValidAdm = await usersRepository.find({ isAdm: true });
-
-    jwt.verify(
-      tokenItself,
-      config.secret as string,
-      async (error, decoded: any) => {
-        for (let i = 0; i < isValidAdm.length; i++) {
-          if (isValidAdm[i].id === decoded.id) {
-            // Coisas da listagem
-            const allUsers = await usersRepository.find();
-
-            return res.json(allUsers);
-          }
-        }
-        // POR QUE NÃO ESTÁ RETORNANDO????
-        // throw new ErrorHandler("This user is not an administrator!", 401);
-        res.status(401).json({ message: "This user is not an administrator!" });
-      }
-    );
+    const allUsers = await usersRepository.find();
+    return res.json(allUsers);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
@@ -138,48 +93,33 @@ export const listOneUser = async (req: Request, res: Response) => {
       throw new ErrorHandler("Id must be uuid!", 404);
     }
 
-    // Coisas de token
-    const auth = req.headers.authorization;
-
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
-
     const userId = await userRepository.findOne({ id });
     if (!userId) {
       throw new ErrorHandler("No user found!", 404);
     }
+
+    const auth = req.headers.authorization;
+
+    const tokenItself = areHeadersEnabled(auth);
 
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (err, decoded: any) => {
         const tokenId = decoded.id;
-        const userProfile = await userRepository.findOne({ id: tokenId });
-        console.log(userProfile);
+        const userWithThisId = await userRepository.findOne({ id: tokenId });
+        if (!userWithThisId) {
+          throw new ErrorHandler("No user found!", 404);
+        }
       }
     );
 
-    // Coisas de Admin
     const isValidAdm = await userRepository.find({ isAdm: true });
 
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
-        console.log(decoded.id);
         for (let i = 0; i < isValidAdm.length; i++) {
           if (isValidAdm[i].id === decoded.id) {
             return res.json(userId);

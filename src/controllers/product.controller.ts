@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { getCustomRepository, getRepository } from "typeorm";
-import jwt from "jsonwebtoken";
 
-import config from "../config/jwt.config";
 import Product from "../entities/Product";
 import User from "../entities/User";
 import ErrorHandler from "../utils/errors";
 import ProductRepository from "../repository/product.repository";
+import CartRepository from "../repository/cart.repository";
 
 export const registerProduct = async (req: Request, res: Response) => {
   const { name, type, price } = req.body;
 
   const ProductCustomRepository = getCustomRepository(ProductRepository);
   const productRepository = getRepository(Product);
-  const userRepository = getRepository(User);
+
+  const CartCustomRepository = getCustomRepository(CartRepository);
 
   try {
     const productAlreadyExists = await productRepository.findOne({ name });
@@ -22,52 +22,18 @@ export const registerProduct = async (req: Request, res: Response) => {
       throw new ErrorHandler("Product already registered!", 403);
     }
 
-    // Coisas de token
-    const auth = req.headers.authorization;
-
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
+    const product = ProductCustomRepository.create({
+      name,
+      type,
+      price,
     });
+    const newProduct = await ProductCustomRepository.save(product);
+    console.log(newProduct);
+    const productCart = CartCustomRepository.create(newProduct);
+    const newCart = await CartCustomRepository.save(productCart);
+    console.log(newCart);
 
-    // Coisas de Admin
-
-    const isValidAdm = await userRepository.find({ isAdm: true });
-
-    jwt.verify(
-      tokenItself,
-      config.secret as string,
-      async (error, decoded: any) => {
-        for (let i = 0; i < isValidAdm.length; i++) {
-          if (isValidAdm[i].id === decoded.id) {
-            // Coisas do registro
-
-            const newProduct = ProductCustomRepository.create({
-              name,
-              type,
-              price,
-            });
-
-            await ProductCustomRepository.save(newProduct);
-            return res.json(newProduct);
-          }
-        }
-        // POR QUE NÃO ESTÁ RETORNANDO????
-        // throw new ErrorHandler("This user is not an administrator!", 401);
-        res.status(401).json({ message: "This user is not an administrator!" });
-      }
-    );
+    return res.json(product);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }

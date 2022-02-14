@@ -22,9 +22,6 @@ class Sell {
   @Column()
   clientEmail: string;
 
-  // @Column()
-  // products: object[];
-
   @Column({ default: 0 })
   totalPrice: number;
 
@@ -35,17 +32,12 @@ class Sell {
   @JoinColumn()
   cart!: Cart;
 
-  @ManyToOne((type) => User, (user) => user.sells) user!: User;
+  @ManyToOne((type) => User, (user) => user.sells)
+  user!: User;
 
-  constructor(
-    clientName: string,
-    clientEmail: string,
-    // products: object[],
-    totalPrice: number
-  ) {
+  constructor(clientName: string, clientEmail: string, totalPrice: number) {
     this.clientName = clientName;
     this.clientEmail = clientEmail;
-    // this.products = products;
     this.totalPrice = totalPrice;
   }
 }
