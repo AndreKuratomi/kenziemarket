@@ -10,9 +10,9 @@ import {
 
 const route = Router();
 
-export const sellRouter = () => {
-  route.post("", makeSell);
-  route.get("", listAllSells);
-  route.get("/:id", listOneSell);
-  return route;
-};
+// export const sellRouter = () => {
+//   route.post("", makeSell);
+//   route.get("", listAllSells);
+//   route.get("/:id", listOneSell);
+//   return route;
+// };
