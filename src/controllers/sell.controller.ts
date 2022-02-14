@@ -8,6 +8,7 @@ import Product from "../entities/Product";
 import Cart from "../entities/Cart";
 import Sell from "../entities/Sell";
 import ErrorHandler from "../utils/errors";
+import { areHeadersEnabled } from "../services/token.service";
 
 const userRepository = getRepository(User);
 const cartRepository = getRepository(Cart);
@@ -20,20 +21,7 @@ export const makeSell = async (req: Request, res: Response) => {
     // Coisas de token
     const auth = req.headers.authorization;
 
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
+    const tokenItself = areHeadersEnabled(auth);
 
     jwt.verify(
       tokenItself,
@@ -83,23 +71,9 @@ export const makeSell = async (req: Request, res: Response) => {
 
 export const listAllSells = async (req: Request, res: Response) => {
   try {
-    // Coisas de token
     const auth = req.headers.authorization;
 
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
+    const tokenItself = areHeadersEnabled(auth);
 
     // Coisas de Admin
     const isValidAdm = await userRepository.find({ isAdm: true });
@@ -129,23 +103,9 @@ export const listOneSell = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    // Coisas de token
     const auth = req.headers.authorization;
 
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
+    const tokenItself = areHeadersEnabled(auth);
 
     jwt.verify(
       tokenItself,
