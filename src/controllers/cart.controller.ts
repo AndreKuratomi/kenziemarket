@@ -187,18 +187,20 @@ export const deleteFromCart = async (req: Request, res: Response) => {
           // E tem este product_id no carrinho dele?
           for (let i = 0; i < cartProducts.length; i++) {
             if (cartProducts[i].id === product_id) {
+              const productName = cartProducts[i].name;
+
               const newCart = cartProducts.filter(
                 (elt) => elt.id !== product_id
               );
 
               cartProducts = newCart;
+              cart.product = cartProducts;
 
-              // REMOVEU MAS NÃO ATUALIZOU
               await cartRepository.save(cart);
               console.log(cart);
 
               return res.json({
-                message: `Product ${cartProducts[i].name} deleted from cart of client ${user.name}.`,
+                message: `Product ${productName} deleted from cart of client ${user.name}.`,
               });
             }
           }
@@ -206,15 +208,21 @@ export const deleteFromCart = async (req: Request, res: Response) => {
         }
 
         if (userProfile[0].id === cart.id) {
-          const cartProducts = cart.product;
+          let cartProducts = cart.product;
           for (let i = 0; i < cartProducts.length; i++) {
             if (cartProducts[i].id === product_id) {
-              cartProducts.filter((elt) => elt.id !== product_id);
+              const productName = cartProducts[i].name;
 
+              const newCart = cartProducts.filter(
+                (elt) => elt.id !== product_id
+              );
+              // REMOVEU MAS NÃO ATUALIZOU
+              cartProducts = newCart;
+              cart.product = cartProducts;
               await cartRepository.save(cart);
 
               return res.json({
-                message: `Product ${cartProducts[i].name} deleted from cart of client ${user.name}.`,
+                message: `Product ${productName} deleted from cart of client ${user.name}.`,
               });
             }
           }

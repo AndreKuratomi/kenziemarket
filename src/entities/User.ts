@@ -33,8 +33,8 @@ class User {
   @OneToOne((type) => Cart, (cart) => cart.user)
   cart!: Cart;
 
-  // @OneToMany((type) => Sell, (sell) => sell.user)
-  // sells!: Sell[];
+  @OneToMany((type) => Sell, (sell) => sell.user)
+  sells!: Sell[];
 
   constructor(name: string, email: string, password: string, isAdm: boolean) {
     this.name = name;

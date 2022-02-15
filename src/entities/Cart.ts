@@ -32,8 +32,8 @@ class Cart {
   )
   product!: Product[];
 
-  // @OneToOne((type) => Sell, (sell) => sell.cart)
-  // sell!: Sell;
+  @OneToOne((type) => Sell, (sell) => sell.cart)
+  sell!: Sell;
 }
 
 export default Cart;
