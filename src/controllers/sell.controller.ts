@@ -1,4 +1,4 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
@@ -8,59 +8,49 @@ import Product from "../entities/Product";
 import Cart from "../entities/Cart";
 import Sell from "../entities/Sell";
 import ErrorHandler from "../utils/errors";
-
-const userRepository = getRepository(User);
-const cartRepository = getRepository(Cart);
-const sellRepository = getRepository(Sell);
+import { areHeadersEnabled } from "../services/token.service";
 
 export const makeSell = async (req: Request, res: Response) => {
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
+  const sellRepository = getRepository(Sell);
   // pegar a compra pelo token do usuário
 
   try {
     // Coisas de token
     const auth = req.headers.authorization;
 
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
+    const tokenItself = areHeadersEnabled(auth);
 
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (err, decoded: any) => {
         const tokenId = decoded.id;
-        const userClient = await userRepository.findOne({ id: tokenId });
+        const [userClient] = await userRepository.find({
+          where: { id: tokenId },
+        });
         if (!userClient) {
           throw new ErrorHandler("No user found!", 404);
         }
 
-        const cart = await cartRepository.findOne({ userId: tokenId });
+        const [cart] = await cartRepository.find({ where: { id: tokenId } });
         if (!cart) {
           throw new ErrorHandler("No cart found!", 404);
         }
 
-        const sell = await sellRepository.findOne({ cartId: tokenId });
+        const [sell] = await sellRepository.find({ where: { id: tokenId } });
         if (!sell) {
           throw new ErrorHandler("No sell found!", 404);
         }
 
         let priceAmount = 0;
-        const cartProducts = cart.products;
+        const cartProducts = cart.product;
 
         for (let count = 0; count < cartProducts.length; count++) {
           priceAmount += cartProducts[count].price;
         }
+        console.log(priceAmount);
         // ver pelo id do cart e
         sell.clientName = userClient.name;
         sell.clientEmail = userClient.email;
@@ -69,7 +59,7 @@ export const makeSell = async (req: Request, res: Response) => {
         const sells = userClient.sells;
         const lastSell = sells[sells.length - 1];
 
-        return response.json({
+        return res.json({
           message: "Sell succesfully done!",
           sell: lastSell,
         });
@@ -77,29 +67,18 @@ export const makeSell = async (req: Request, res: Response) => {
     );
     //   não esquecer de mandar email!
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 export const listAllSells = async (req: Request, res: Response) => {
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
+  const sellRepository = getRepository(Sell);
   try {
-    // Coisas de token
     const auth = req.headers.authorization;
 
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
+    const tokenItself = areHeadersEnabled(auth);
 
     // Coisas de Admin
     const isValidAdm = await userRepository.find({ isAdm: true });
@@ -126,26 +105,15 @@ export const listAllSells = async (req: Request, res: Response) => {
 };
 
 export const listOneSell = async (req: Request, res: Response) => {
+  const userRepository = getRepository(User);
+  const cartRepository = getRepository(Cart);
+  const sellRepository = getRepository(Sell);
   const { id } = req.params;
 
   try {
-    // Coisas de token
     const auth = req.headers.authorization;
 
-    if (auth === undefined) {
-      throw new ErrorHandler("Headers unabled!", 400);
-    }
-
-    const tokenItself = auth.split(" ")[1];
-
-    if (!tokenItself) {
-      throw new ErrorHandler("No token found!", 404);
-    }
-    jwt.verify(tokenItself, config.secret as string, (err: any) => {
-      if (err) {
-        throw new ErrorHandler("Invalid token!", 401);
-      }
-    });
+    const tokenItself = areHeadersEnabled(auth);
 
     jwt.verify(
       tokenItself,

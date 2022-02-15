@@ -69,7 +69,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     return res.json({ token: token });
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
