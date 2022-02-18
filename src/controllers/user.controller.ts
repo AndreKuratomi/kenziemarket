@@ -120,22 +120,25 @@ export const listOneUser = async (req: Request, res: Response) => {
       tokenItself,
       config.secret as string,
       async (error, decoded: any) => {
-        for (let i = 0; i < isValidAdm.length; i++) {
-          if (isValidAdm[i].id === decoded.id) {
-            return res.json(userId);
+        try {
+          for (let i = 0; i < isValidAdm.length; i++) {
+            if (isValidAdm[i].id === decoded.id) {
+              return res.json(userId);
+            }
           }
-        }
 
-        if (decoded.id === id) {
-          const user = await userRepository.findOne({ id });
+          if (decoded.id === id) {
+            const user = await userRepository.findOne({ id });
 
-          return res.json(user);
-        } else {
-          // POR QUE NÃO ESTÁ RETORNANDO????
-          // throw new ErrorHandler("Only admins may list non self-profiles!", 400);
-          res
-            .status(400)
-            .json({ message: "Only admins may list non self-profiles!" });
+            return res.json(user);
+          } else {
+            throw new ErrorHandler(
+              "Only admins may list non self-profiles!",
+              400
+            );
+          }
+        } catch (error: any) {
+          res.status(error.statusCode).json({ message: error.message });
         }
       }
     );
