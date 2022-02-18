@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-export const RegisterUserSchema = yup.object().shape({
+export const UserRegisterSchema = yup.object().shape({
   name: yup
     .string()
     .typeError("'name' must be typeof string!")
