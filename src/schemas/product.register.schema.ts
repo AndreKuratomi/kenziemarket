@@ -8,7 +8,7 @@ export const ProductRegisterSchema = yup.object().shape({
     .required("'name' is a required field!"),
   type: yup
     .string()
-    .typeError("'name' must be typeof string!")
+    .typeError("'type' must be typeof string!")
     .strict(true)
     .required("'type' is a required field!"),
   price: yup
