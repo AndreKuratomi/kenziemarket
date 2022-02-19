@@ -35,9 +35,12 @@ export const registerUser = async (req: Request, res: Response) => {
     const userCart = CartCustomRepository.create(newUser);
     const newCart = await CartCustomRepository.save(userCart);
 
-    return res.json({ newUser });
+    const { password: passaword_data, ...dataWithoutPassword } = newBody;
+
+    return res.json(dataWithoutPassword);
   } catch (error: any) {
-    res.status(error.statusCode).json({ message: error.message });
+    console.log(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -78,7 +81,16 @@ export const listUsers = async (req: Request, res: Response) => {
     const usersRepository = getRepository(User);
 
     const allUsers = await usersRepository.find();
-    return res.json(allUsers);
+
+    let nonSensitiveList = [];
+
+    for (let count = 0; count < allUsers.length; count++) {
+      const { password: passaword_data, ...dataWithoutPassword } =
+        allUsers[count];
+      nonSensitiveList.push(dataWithoutPassword);
+    }
+
+    return res.json(nonSensitiveList);
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
