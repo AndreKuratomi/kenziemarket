@@ -16,8 +16,16 @@ import { UserRegisterSchema } from "../schemas/user.register.schema";
 const route = Router();
 
 export const userRouter = () => {
-  route.post("", validateSchema(UserRegisterSchema), registerUser);
-  route.post("/login", validateSchema(LoginSchema), loginUser);
+  route.post(
+    "",
+    // , validateSchema(UserRegisterSchema)
+    registerUser
+  );
+  route.post(
+    "/login",
+    // , validateSchema(LoginSchema)
+    loginUser
+  );
   route.get("", isTokenValid, isUserAdmn, listUsers);
   route.get("/:id", isTokenValid, listOneUser);
   return route;
