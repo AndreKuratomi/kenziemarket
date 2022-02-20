@@ -10,6 +10,7 @@ import UserRepository from "../repository/user.repository";
 import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
 import { areHeadersEnabled } from "../services/token.service";
+import { ListUsersService, LoginUserService } from "../services/users.service";
 
 export const registerUser = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
@@ -47,29 +48,7 @@ export const registerUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
-    const userRepository = getRepository(User);
-
-    const doesUserExist = await userRepository.findOne({ email });
-
-    if (doesUserExist === undefined) {
-      throw new ErrorHandler("No user found!", 401);
-    }
-
-    const doesPasswordMatch = await bcrypt.compare(
-      password,
-      doesUserExist.password
-    );
-
-    if (!doesPasswordMatch) {
-      throw new ErrorHandler("Given password mismatch!", 401);
-    }
-
-    const id = doesUserExist.id;
-
-    const token: string = jwt.sign({ id }, config.secret as string, {
-      expiresIn: config.expiresIn,
-    });
-
+    const token = await LoginUserService({ email, password });
     return res.json({ token: token });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
@@ -78,9 +57,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
-    const usersRepository = getRepository(User);
-
-    const allUsers = await usersRepository.find();
+    const allUsers = await ListUsersService();
 
     let nonSensitiveList = [];
 
