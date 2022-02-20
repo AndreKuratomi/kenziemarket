@@ -1,11 +1,34 @@
-import { getRepository } from "typeorm";
+import { getCustomRepository, getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 
 import config from "../config/jwt.config";
-import User from "../entities/User";
 import ErrorHandler from "../utils/errors";
-import IUserLogin from "../types/types";
+import { IUserLogin, IUserRegister } from "../types/types";
+import User from "../entities/User";
+import UserRepository from "../repository/user.repository";
+
+export const RegisterUserService = async ({
+  name,
+  email,
+  password,
+  isAdm,
+}: IUserRegister) => {
+  const UserCustomRepository = getCustomRepository(UserRepository);
+
+  const emailAlreadyExists = await UserCustomRepository.findOne({ email });
+
+  if (emailAlreadyExists) {
+    throw new ErrorHandler("Email already registered!", 403);
+  }
+
+  const hashing = await bcrypt.hash(password as string, 10);
+  password = hashing;
+
+  const newBody = { name, email, password, isAdm };
+
+  return newBody;
+};
 
 export const LoginUserService = async ({ email, password }: IUserLogin) => {
   const userRepository = getRepository(User);

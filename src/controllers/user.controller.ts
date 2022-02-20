@@ -10,25 +10,18 @@ import UserRepository from "../repository/user.repository";
 import CartRepository from "../repository/cart.repository";
 import ErrorHandler from "../utils/errors";
 import { areHeadersEnabled } from "../services/token.service";
-import { ListUsersService, LoginUserService } from "../services/users.service";
+import {
+  RegisterUserService,
+  ListUsersService,
+  LoginUserService,
+} from "../services/users.service";
 
 export const registerUser = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
   const CartCustomRepository = getCustomRepository(CartRepository);
 
   try {
-    let { name, email, password, isAdm } = req.body;
-
-    const emailAlreadyExists = await UserCustomRepository.findOne({ email });
-
-    if (emailAlreadyExists) {
-      throw new ErrorHandler("Email already registered!", 403);
-    }
-
-    const hashing = await bcrypt.hash(password as string, 10);
-    password = hashing;
-
-    const newBody = { name, email, password, isAdm };
+    const newBody = await RegisterUserService(req.body);
 
     const user = UserCustomRepository.create(newBody);
     const newUser = await UserCustomRepository.save(user);
