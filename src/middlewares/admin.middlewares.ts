@@ -30,8 +30,8 @@ export const isUserAdmn = async (
           }
         }
         // POR QUE NÃO ESTÁ RETORNANDO????
-        // throw new ErrorHandler("This user is not an administrator!", 401);
-        res.status(401).json({ message: "This user is not an administrator!" });
+        throw new ErrorHandler("This user is not an administrator!", 401);
+        // res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
