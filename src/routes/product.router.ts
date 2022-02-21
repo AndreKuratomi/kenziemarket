@@ -16,7 +16,7 @@ const route = Router();
 export const productRouter = () => {
   route.post(
     "",
-    // validateSchema(ProductRegisterSchema),
+    validateSchema(ProductRegisterSchema),
     isTokenValid,
     isUserAdmn,
     registerProduct

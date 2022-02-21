@@ -15,12 +15,7 @@ import { AddToCartSchema } from "../schemas/cart.add.schema";
 const route = Router();
 
 export const cartRouter = () => {
-  route.post(
-    "",
-    // , validateSchema(AddToCartSchema)
-    isTokenValid,
-    addToCart
-  );
+  route.post("", validateSchema(AddToCartSchema), isTokenValid, addToCart);
   route.get("", isTokenValid, isUserAdmn, listAllCarts);
   route.get("/:id", isTokenValid, listOneCart);
   route.delete("/:id/:product_id", isTokenValid, deleteFromCart);

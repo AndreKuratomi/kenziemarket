@@ -1,3 +1,5 @@
+import originalBcrypt from "bcrypt";
+
 export interface IUserRegister {
   name: string;
   email: string;
@@ -8,4 +10,8 @@ export interface IUserRegister {
 export interface IUserLogin {
   email: string;
   password: string;
+}
+
+export namespace bcrypt {
+  export const hash = originalBcrypt.hash;
 }
