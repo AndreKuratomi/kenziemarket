@@ -29,12 +29,11 @@ export const registerUser = async (req: Request, res: Response) => {
     const userCart = CartCustomRepository.create(newUser);
     const newCart = await CartCustomRepository.save(userCart);
 
-    const { password: passaword_data, ...dataWithoutPassword } = newBody;
+    const { password: passaword_data, ...dataWithoutPassword } = newUser;
 
     return res.json(dataWithoutPassword);
   } catch (error: any) {
-    console.log(error);
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -105,14 +104,18 @@ export const listOneUser = async (req: Request, res: Response) => {
         try {
           for (let i = 0; i < isValidAdm.length; i++) {
             if (isValidAdm[i].id === decoded.id) {
-              return res.json(userId);
+              const { password: passaword_data, ...dataWithoutPassword } =
+                userId;
+
+              return res.json(dataWithoutPassword);
             }
           }
 
           if (decoded.id === id) {
-            const user = await userRepository.findOne({ id });
+            const [user] = await userRepository.find({ where: { id: id } });
+            const { password: passaword_data, ...dataWithoutPassword } = user;
 
-            return res.json(user);
+            return res.json(dataWithoutPassword);
           } else {
             throw new ErrorHandler(
               "Only admins may list non self-profiles!",
