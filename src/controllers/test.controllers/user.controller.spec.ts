@@ -2,14 +2,6 @@ import { createConnection, getConnection } from "typeorm";
 import request from "supertest";
 import { bcrypt } from "../../types/types";
 
-// import {
-//   LoginUserService,
-//   ListUsersService,
-//   RegisterUserService,
-// } from "../../users.service";
-// import IUserLogin from "../../types/types";
-// import { Request, Response } from "express";
-// import { registerUser } from "../user.controller";
 import app from "../../app";
 
 jest.mock("uuid", () => ({ v4: () => "uuid" }));

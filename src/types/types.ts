@@ -12,6 +12,12 @@ export interface IUserLogin {
   password: string;
 }
 
+export interface IProductRegister {
+  name: string;
+  type: string;
+  price: number;
+}
+
 export namespace bcrypt {
   export const hash = originalBcrypt.hash;
 }
