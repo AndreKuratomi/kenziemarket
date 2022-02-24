@@ -10,12 +10,11 @@ import {
 } from "../users.service";
 
 jest.mock("uuid", () => ({ v4: () => "uuid" }));
-// jest.mock("createdOn", () => "createdOn"); //??
-const spyCompare = jest.spyOn(bcrypt, "hash");
+const spyCompare = jest.spyOn(bcrypt, "hash"); // NÃO TEM EFEITO
 // .mockImplementation(() => Promise.resolve(false));
-// ERRO NO PARÂMETRO DE .MOCKERETURNVALUE. DIZ QUE O TIPO É VOID
+
 spyCompare.mockReturnValue();
-// está retornando o password hashed mas quero como acima
+
 describe("Register user", () => {
   beforeAll(async () => {
     await createConnection();
@@ -34,19 +33,12 @@ describe("Register user", () => {
       isAdm: true,
     };
 
-    const responseData = {
-      name: "André",
-      email: "teste2@mail.com",
-      password: "1234",
-      isAdm: true,
-    };
-
     const object = await RegisterUserService(data);
 
     expect(object).toHaveProperty("isAdm");
-    expect(object.password).not.toBe("123");
-    expect(object).toBe(responseData);
-    // expect(spyCompare).toBeCalledWith("1234");
+    expect(object.password).not.toHaveLength(60);
+    expect(spyCompare).toBe(bcrypt);
+    expect(object).toBe(data);
   });
 });
 
@@ -65,8 +57,8 @@ describe("Login user", () => {
 
     const token = await LoginUserService(data);
 
-    // expect(token).toBe("string");  NA VERDADE EU QUERIA UMA PROPRIEDADE DE EXPECT QUE IDENTIFICASSE O TIPO
     expect(token).toHaveProperty("split");
+    expect(token).toEqual(expect.any(String));
   });
 });
 
@@ -83,7 +75,6 @@ describe("List users", () => {
   it("Should be able to return the list of all users", async () => {
     const allUsers = await ListUsersService();
 
-    // expect(allUsers).toBe(an array); NA VERDADE EU QUERIA UMA PROPRIEDADE DE EXPECT QUE IDENTIFICASSE O TIPO
     expect(allUsers).toHaveProperty("map");
   });
 });

@@ -17,13 +17,21 @@ services:
     image: postgres:latest
     restart: always
     ports: [5430:5432]
-    environment: [PG_USER=postgres, PG_PASSWORD=12345, PG_DB=kenzie_market]
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_HOST: ${PG_HOST}
 
   db_for_tests:
     image: postgres:latest
     restart: always
     ports: [5431:5433]
-    environment: [PG_USER=postgres, PG_PASSWORD=12345, PG_DB=tests]
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB_TEST: ${PG_DB_TEST}
+      POSTGRES_HOST: db_for_test
     command: -p 5433
 
   adminer:

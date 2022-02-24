@@ -8,11 +8,7 @@ const devEnv = {
   password: process.env.PG_PASSWORD,
   host: process.env.PG_HOST,
   port: 5430,
-  database:
-    // process.env.NODE_ENV === "supertest"
-    //   ? "NODE_ENV=test jest"
-    //   :
-    process.env.PG_DB,
+  database: process.env.PG_DB,
   // "database": "kenzie_market",
   synchronize: false,
   logging: false,
@@ -32,12 +28,8 @@ const testEnv = {
   password: process.env.PG_PASSWORD,
   host: process.env.PG_HOST,
   port: 5431,
-  database:
-    // process.env.NODE_ENV === "supertest"
-    //   ? "NODE_ENV=test jest"
-    //   :
-    process.env.PG_DB_TEST,
-  // "database": "kenzie_market",
+  database: process.env.PG_DB_TEST,
+  // "database": "tests",
   synchronize: false,
   logging: false,
   entities: ["./src/entities/**/*.ts"],

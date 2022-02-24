@@ -1,12 +1,7 @@
 import { getCustomRepository, getRepository } from "typeorm";
-import jwt from "jsonwebtoken";
-import * as bcrypt from "bcrypt";
 
-import config from "../config/jwt.config";
 import ErrorHandler from "../utils/errors";
-import { IProductRegister, IUserLogin, IUserRegister } from "../types/types";
-import User from "../entities/User";
-import UserRepository from "../repository/user.repository";
+import { IProductRegister } from "../types/types";
 import ProductRepository from "../repository/product.repository";
 import Product from "../entities/Product";
 
