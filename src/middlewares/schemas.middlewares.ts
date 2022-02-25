@@ -5,7 +5,7 @@ import ErrorHandler from "../utils/errors";
 export const validateSchema =
   (schema: yup.AnyObjectSchema) =>
   async (
-    error: ErrorHandler,
+    // error: ErrorHandler,
     req: Request,
     res: Response,
     next: NextFunction

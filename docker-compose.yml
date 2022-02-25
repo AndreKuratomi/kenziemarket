@@ -5,24 +5,32 @@ services:
   #   image: node:latest
   #   restart: always
   #   build: .
-  #   ports: [3000:4000]
+  #   ports: [3000:3000]
   #   volumes:
-  #     - .:/code
+  #     - .:/code # Faz um link do diretório atual para diretório do container
   #   environment:
-  #     [PGUSER=postgres, PGPASSWORD=12345, PGDATABASE=kenzie_market, PGHOST=db]
+  #     [PG_USER=postgres, PG_PASSWORD=12345, PG_DATABASE=kenzie_market, PG_HOST=db, SECRET=secret]
   #   depends_on:
   #     - db
 
   db:
     image: postgres:latest
     restart: always
-    ports: [5432:5432]
+    ports: [5430:5432]
     environment:
-      [
-        POSTGRES_USER=postgres,
-        POSTGRES_PASSWORD=12345,
-        POSTGRES_DB=kenzie_market,
-      ]
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+
+  db_for_tests:
+    image: postgres:latest
+    restart: always
+    ports: [5431:5433]
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB_TEST}
+    command: -p 5433
 
   adminer:
     image: adminer
