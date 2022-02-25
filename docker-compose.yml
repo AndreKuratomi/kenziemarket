@@ -21,7 +21,6 @@ services:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
       POSTGRES_DB: ${PG_DB}
-      POSTGRES_HOST: ${PG_HOST}
 
   db_for_tests:
     image: postgres:latest
@@ -30,8 +29,7 @@ services:
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DB_TEST: ${PG_DB_TEST}
-      POSTGRES_HOST: db_for_test
+      POSTGRES_DB: ${PG_DB_TEST}
     command: -p 5433
 
   adminer:
