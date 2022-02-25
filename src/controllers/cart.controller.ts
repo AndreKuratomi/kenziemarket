@@ -28,40 +28,44 @@ export const addToCart = async (req: Request, res: Response) => {
       throw new ErrorHandler("No product found!", 404);
     }
 
+    const { ...object } = doesAcquiredProductExist;
+
     jwt.verify(
       tokenItself,
       config.secret as string,
       async (err, decoded: any) => {
         const tokenId = decoded.id;
-        const userClient = await userRepository.findOne({ id: tokenId });
-        if (!userClient) {
-          throw new ErrorHandler("No user found!", 404);
+        try {
+          const userClient = await userRepository.findOne({ id: tokenId });
+          if (!userClient) {
+            throw new ErrorHandler("No user found!", 404);
+          }
+
+          const owner = userClient.id;
+          console.log(userClient.cart);
+          // const [cart] = await cartRepository.find({ //outra maneira de escrever
+          //[] denota que va ipegar o primeiro índice
+          const cart = await cartRepository.find({
+            where: { id: tokenId },
+            relations: ["product"], //especifica para este caso
+          });
+
+          if (!cart) {
+            throw new ErrorHandler("No cart found!", 404);
+          }
+
+          // cart.product.push(doesAcquiredProductExist); //já está como primeiro elemento
+          cart[0].product.push(doesAcquiredProductExist); //aqui delimitei
+          console.log(cart[0].product);
+          const newCart = await cartRepository.save(cart);
+
+          return res.json({
+            message: "Product succesfully added to your cart!",
+            cart: cart,
+          });
+        } catch (error: any) {
+          res.status(error.statusCode).json({ message: error.message });
         }
-
-        const owner = userClient.id;
-        console.log(userClient.cart);
-        // const [cart] = await cartRepository.find({ //outra maneira de escrever
-        //[] denota que va ipegar o primeiro índice
-        const cart = await cartRepository.find({
-          where: { id: tokenId },
-          relations: ["product"], //especifica para este caso
-        });
-
-        if (!cart) {
-          // MAS POR QUE NÃO RETORNA???
-          // throw new ErrorHandler("No cart found!", 404);
-          res.status(404).json({ message: "No cart found!" });
-        }
-
-        // cart.product.push(doesAcquiredProductExist); //já está como primeiro elemento
-        cart[0].product.push(doesAcquiredProductExist); //aqui delimitei
-
-        const newCart = await cartRepository.save(cart);
-
-        return res.json({
-          message: "Product succesfully added to your cart!",
-          cart: cart,
-        });
       }
     );
   } catch (error: any) {
@@ -105,31 +109,34 @@ export const listOneCart = async (req: Request, res: Response) => {
       config.secret as string,
       async (err, decoded: any) => {
         const tokenId = decoded.id;
-        const [userProfile] = await userRepository.find({
-          where: { id: tokenId },
-        });
-        if (!userProfile) {
-          throw new ErrorHandler("No user found!", 404);
-        }
+        try {
+          const [userProfile] = await userRepository.find({
+            where: { id: tokenId },
+          });
+          if (!userProfile) {
+            throw new ErrorHandler("No user found!", 404);
+          }
 
-        const [cart] = await cartRepository.find({
-          where: { id: tokenId },
-          relations: ["product"],
-        });
-        if (!cart) {
-          throw new ErrorHandler("No cart found!", 404);
-        }
+          const [cart] = await cartRepository.find({
+            where: { id: tokenId },
+            relations: ["product"],
+          });
+          if (!cart) {
+            throw new ErrorHandler("No cart found!", 404);
+          }
 
-        if (userProfile.isAdm) {
-          return res.json(cart);
-        } else if (userProfile.id === id) {
-          return res.json(cart);
-        } else {
-          // MAS POR QUE NÃO RETORNA???
-          // throw new ErrorHandler("Only admins may check non self-carts!", 401);
-          res
-            .status(401)
-            .json({ message: "Only admins may check non self-carts!" });
+          if (userProfile.isAdm) {
+            return res.json(cart);
+          } else if (userProfile.id === id) {
+            return res.json(cart);
+          } else {
+            throw new ErrorHandler(
+              "Only admins may check non self-carts!",
+              401
+            );
+          }
+        } catch (e: any) {
+          res.status(e.statusCode).json({ message: e.message });
         }
       }
     );
@@ -174,67 +181,68 @@ export const deleteFromCart = async (req: Request, res: Response) => {
       config.secret as string,
       async (err, decoded: any) => {
         const tokenId = decoded.id;
-
-        const userProfile = await userRepository.find({
-          where: { id: tokenId },
-        });
-        if (!userProfile) {
-          throw new ErrorHandler("No user found!", 404);
-        }
-
-        if (userProfile[0].isAdm) {
-          let cartProducts = cart.product;
-          // E tem este product_id no carrinho dele?
-          for (let i = 0; i < cartProducts.length; i++) {
-            if (cartProducts[i].id === product_id) {
-              const productName = cartProducts[i].name;
-
-              const newCart = cartProducts.filter(
-                (elt) => elt.id !== product_id
-              );
-
-              cartProducts = newCart;
-              cart.product = cartProducts;
-
-              await cartRepository.save(cart);
-              console.log(cart);
-
-              return res.json({
-                message: `Product ${productName} deleted from cart of client ${user.name}.`,
-              });
-            }
+        try {
+          const userProfile = await userRepository.find({
+            where: { id: tokenId },
+          });
+          if (!userProfile) {
+            throw new ErrorHandler("No user found!", 404);
           }
-          throw new ErrorHandler("No product found!", 404);
-        }
 
-        if (userProfile[0].id === cart.id) {
-          let cartProducts = cart.product;
-          for (let i = 0; i < cartProducts.length; i++) {
-            if (cartProducts[i].id === product_id) {
-              const productName = cartProducts[i].name;
+          if (userProfile[0].isAdm) {
+            let cartProducts = cart.product;
+            // E tem este product_id no carrinho dele?
+            for (let i = 0; i < cartProducts.length; i++) {
+              if (cartProducts[i].id === product_id) {
+                const productName = cartProducts[i].name;
 
-              const newCart = cartProducts.filter(
-                (elt) => elt.id !== product_id
-              );
-              // REMOVEU MAS NÃO ATUALIZOU
-              cartProducts = newCart;
-              cart.product = cartProducts;
-              await cartRepository.save(cart);
+                const newCart = cartProducts.filter(
+                  (elt) => elt.id !== product_id
+                );
 
-              return res.json({
-                message: `Product ${productName} deleted from cart of client ${user.name}.`,
-              });
+                cartProducts = newCart;
+                cart.product = cartProducts;
+
+                await cartRepository.save(cart);
+                console.log(cart);
+
+                return res.json({
+                  message: `Product ${productName} deleted from cart of client ${user.name}.`,
+                });
+              }
             }
+            throw new ErrorHandler("No product found!", 404);
           }
-          throw new ErrorHandler("No product found!", 404);
-        } else {
-          // POR QUE AQUI NÃO FUNCIONA?
-          // throw new ErrorHandler(
-          //   "Only admins or the own user may delete its cart!",
-          //   401
-          // );
-          res.status(401).json({
-            message: "Only admins or the own user may delete its product cart!",
+
+          if (userProfile[0].id === cart.id) {
+            let cartProducts = cart.product;
+            for (let i = 0; i < cartProducts.length; i++) {
+              if (cartProducts[i].id === product_id) {
+                const productName = cartProducts[i].name;
+
+                const newCart = cartProducts.filter(
+                  (elt) => elt.id !== product_id
+                );
+
+                cartProducts = newCart;
+                cart.product = cartProducts;
+                await cartRepository.save(cart);
+
+                return res.json({
+                  message: `Product ${productName} deleted from cart of client ${user.name}.`,
+                });
+              }
+            }
+            throw new ErrorHandler("No product found!", 404);
+          } else {
+            throw new ErrorHandler(
+              "Only admins or the own user may delete its cart!",
+              401
+            );
+          }
+        } catch (error: any) {
+          res.status(error.statusCode).json({
+            message: error.message,
           });
         }
       }

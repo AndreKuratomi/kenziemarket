@@ -9,11 +9,13 @@ import {
 
 import { isTokenValid } from "../middlewares/tokenCheck.middlewares";
 import { isUserAdmn } from "../middlewares/admin.middlewares";
+import { validateSchema } from "../middlewares/schemas.middlewares";
+import { AddToCartSchema } from "../schemas/cart.add.schema";
 
 const route = Router();
 
 export const cartRouter = () => {
-  route.post("", isTokenValid, addToCart);
+  route.post("", validateSchema(AddToCartSchema), isTokenValid, addToCart);
   route.get("", isTokenValid, isUserAdmn, listAllCarts);
   route.get("/:id", isTokenValid, listOneCart);
   route.delete("/:id/:product_id", isTokenValid, deleteFromCart);
