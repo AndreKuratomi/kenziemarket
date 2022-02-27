@@ -1,0 +1,75 @@
+{
+  "openapi": "3.0.0",
+
+  "info": {
+    "title": "Kenzie Market!",
+    "description": "",
+    "contact": {
+      "name": "",
+      "url": "",
+      "email": ""
+    },
+    "version": ""
+  },
+
+  "servers": [
+    {
+      "url": "",
+      "description": ""
+    }
+  ],
+
+  "paths": {
+    "/user": {
+      "post": {
+        "description": "",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "isAdm": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
