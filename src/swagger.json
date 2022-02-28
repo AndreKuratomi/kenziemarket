@@ -83,6 +83,23 @@
               }
             }
           },
+          "403": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "message": "Email already registered!"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "200": {
             "description": "Ok",
             "content": {
@@ -109,29 +126,40 @@
 
         "security": [{}]
       },
+
       "get": {
         "description": "Lists all users.",
         "deprecated": false,
         "tags": [],
 
         "requestBody": {
+          "description": "No content body required",
           "content": {},
-          "examples": {}
+          "required": false
         },
 
         "responses": {
-          "400": {
-            "description": ""
-          },
-          "401": {
-            "description": ""
-          },
           "200": {
-            "description": "",
+            "description": "Ok",
             "content": {
-              "schema": {
-                "type": "",
-                "$ref": ""
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UsersListResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": [
+                      {
+                        "name": "André",
+                        "email": "mail@mail.com",
+                        "isAdm": true,
+                        "id": "996a4147-beb7-4263-9cd3-84edcca4e135",
+                        "createdOn": "2022-02-28T04:07:15.794Z"
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -162,6 +190,12 @@
                     "email": "mailmail.com",
                     "password": 1234
                   }
+                },
+                "loginUnknownUser": {
+                  "value": {
+                    "email": "unknown@mail.com",
+                    "password": "1234"
+                  }
                 }
               }
             }
@@ -178,7 +212,7 @@
                   "$ref": "#/components/schemas/UserLoginErrorResponse"
                 },
                 "examples": {
-                  "user": {
+                  "loginError": {
                     "value": {
                       "message": {
                         "ValidationError": [
@@ -186,6 +220,11 @@
                           "The field 'password' must be typeof string!"
                         ]
                       }
+                    }
+                  },
+                  "notFoundUser": {
+                    "value": {
+                      "message": "No user found!"
                     }
                   }
                 }
@@ -220,25 +259,65 @@
         "description": "Lists a specific user by its id.",
         "deprecated": false,
         "tags": [],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
 
         "requestBody": {
+          "description": "No content body required",
           "content": {},
-          "examples": {}
+          "required": false
         },
 
         "responses": {
-          "400": {
-            "description": ""
-          },
-          "401": {
-            "description": ""
-          },
-          "201": {
-            "description": "",
+          "404": {
+            "description": "Bad request",
             "content": {
-              "schema": {
-                "type": "",
-                "$ref": ""
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "Id not found": {
+                    "value": {
+                      "message": "Id must be UUID!"
+                    }
+                  },
+                  "notFoundUser": {
+                    "value": {
+                      "message": "No user found!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/OneUserListResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "name": "André",
+                      "email": "mail@mail.com",
+                      "isAdm": true,
+                      "id": "996a4147-beb7-4263-9cd3-84edcca4e135",
+                      "createdOn": "2022-02-28T04:07:15.794Z"
+                    }
+                  }
+                }
               }
             }
           }
@@ -253,8 +332,16 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductRegisterRequest"
+                },
+                "examples": {}
+              }
+            }
+          }
         },
 
         "responses": {
@@ -267,9 +354,11 @@
           "201": {
             "description": "",
             "content": {
-              "schema": {
-                "type": "",
-                "$ref": ""
+              "application/json": {
+                "schema": {
+                  "type": "",
+                  "$ref": "ProductRegisterResponse"
+                }
               }
             }
           }
@@ -281,8 +370,14 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/"
+              },
+              "examples": {}
+            }
+          }
         },
 
         "responses": {
@@ -311,8 +406,14 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/"
+              },
+              "examples": {}
+            }
+          }
         },
 
         "responses": {
@@ -342,8 +443,14 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/"
+              },
+              "examples": {}
+            }
+          }
         },
 
         "responses": {
@@ -370,8 +477,14 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/"
+              },
+              "examples": {}
+            }
+          }
         },
 
         "responses": {
@@ -400,8 +513,14 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/"
+              },
+              "examples": {}
+            }
+          }
         },
 
         "responses": {
@@ -430,8 +549,14 @@
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/"
+              },
+              "examples": {}
+            }
+          }
         },
 
         "responses": {
@@ -539,6 +664,31 @@
           }
         }
       },
+      "UsersListResponse": {
+        "type": "array"
+      },
+      "OneUserListResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isAdm": {
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Generated by UUID V4.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      },
 
       "Product": {
         "type": "object",
@@ -554,6 +704,7 @@
           }
         }
       },
+
       "Cart": {
         "type": "object",
         "properties": {
@@ -575,18 +726,26 @@
         }
       }
     },
+
     "securitySchemes": {
-      "JWT": {
+      "Bearer": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
       }
     }
   },
 
   "security": [
     {
-      "JWT": []
+      "Bearer": []
+    },
+    {
+      "BasicAuth": []
     }
   ]
 }
