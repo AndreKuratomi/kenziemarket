@@ -105,7 +105,9 @@
               }
             }
           }
-        }
+        },
+
+        "security": [{}]
       },
       "get": {
         "description": "Lists all users.",
@@ -208,7 +210,9 @@
               }
             }
           }
-        }
+        },
+
+        "security": [{}]
       }
     },
     "/user/{user_id}": {
@@ -570,6 +574,19 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "JWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     }
-  }
+  },
+
+  "security": [
+    {
+      "JWT": []
+    }
+  ]
 }
