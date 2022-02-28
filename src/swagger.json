@@ -26,7 +26,92 @@
   "paths": {
     "/user": {
       "post": {
-        "description": "",
+        "description": "Registers a user.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Lists all users.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "description": "Logs a user.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{user_id}": {
+      "get": {
+        "description": "Lists a specific user by its id.",
         "tags": [],
 
         "requestBody": {
