@@ -137,6 +137,207 @@
           }
         }
       }
+    },
+
+    "/product": {
+      "post": {
+        "description": "Registers a product.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Lists all products.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/{product_id}": {
+      "get": {
+        "description": "Lists a specific product by its id.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/cart": {
+      "post": {
+        "description": "Adds a product to cart.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Lists all carts.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/{cart_id}": {
+      "get": {
+        "description": "Lists a specific cart by its id.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/{cart_id}/{product_id}": {
+      "delete": {
+        "description": "Deletes a specific product by its id from a specific cart.",
+        "tags": [],
+
+        "requestBody": {
+          "content": {},
+          "examples": {}
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "schema": {
+                "type": "",
+                "$ref": ""
+              }
+            }
+          }
+        }
+      }
     }
   },
 
