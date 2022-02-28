@@ -359,6 +359,40 @@
             "type": "boolean"
           }
         }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
       }
     }
   }
