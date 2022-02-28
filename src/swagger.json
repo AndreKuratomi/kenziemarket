@@ -27,26 +27,81 @@
     "/user": {
       "post": {
         "description": "Registers a user.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              },
+              "examples": {
+                "user": {
+                  "value": {
+                    "name": "André",
+                    "email": "mail@mail.com",
+                    "password": "1234",
+                    "isAdm": true
+                  }
+                },
+                "userWithErrors": {
+                  "value": {
+                    "email": "mailmail.com",
+                    "password": 1234,
+                    "isAdm": "true"
+                  }
+                }
+              }
+            }
+          }
         },
 
         "responses": {
           "400": {
-            "description": ""
-          },
-          "401": {
-            "description": ""
-          },
-          "201": {
-            "description": "",
+            "description": "Bad request",
             "content": {
-              "schema": {
-                "type": "",
-                "$ref": ""
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UserRegisterErrorResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "message": {
+                        "ValidationError": [
+                          "'name' is a required field!",
+                          "Invalid email. Correct format example: 'email@email.com'",
+                          "'password' must be typeof string!",
+                          "'isAdm' must be typeof boolean!"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UserRegisterResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "name": "André",
+                      "email": "mail@mail.com",
+                      "isAdm": true,
+                      "id": "996a4147-beb7-4263-9cd3-84edcca4e135",
+                      "createdOn": "2022-02-28T04:07:15.794Z"
+                    }
+                  }
+                }
               }
             }
           }
@@ -54,6 +109,7 @@
       },
       "get": {
         "description": "Lists all users.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -83,26 +139,72 @@
     "/user/login": {
       "post": {
         "description": "Logs a user.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
-          "content": {},
-          "examples": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              },
+              "examples": {
+                "login": {
+                  "value": {
+                    "email": "mail@mail.com",
+                    "password": "1234"
+                  }
+                },
+                "loginWithErrors": {
+                  "value": {
+                    "email": "mailmail.com",
+                    "password": 1234
+                  }
+                }
+              }
+            }
+          }
         },
 
         "responses": {
           "400": {
-            "description": ""
-          },
-          "401": {
-            "description": ""
-          },
-          "201": {
-            "description": "",
+            "description": "Bad request",
             "content": {
-              "schema": {
-                "type": "",
-                "$ref": ""
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UserLoginErrorResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "message": {
+                        "ValidationError": [
+                          "Invalid email. Correct format example: 'email@email.com'",
+                          "The field 'password' must be typeof string!"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UserLoginResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEzNGQxNGVmLWRhMTYtNDQ3MC05NTM0LWVlMjM4NDEwYWQ4YyIsImlhdCI6MTY0NTQ1ODc2MiwiZXhwIjoxNjQ1NTQ1MTYyfQ.wGR1i-y6pxUbXxtFGzA-vYdhuusxp9nyI2K7GEUPF44"
+                    }
+                  }
+                }
               }
             }
           }
@@ -112,6 +214,7 @@
     "/user/{user_id}": {
       "get": {
         "description": "Lists a specific user by its id.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -142,6 +245,7 @@
     "/product": {
       "post": {
         "description": "Registers a product.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -169,6 +273,7 @@
       },
       "get": {
         "description": "Lists all products.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -198,6 +303,7 @@
     "/product/{product_id}": {
       "get": {
         "description": "Lists a specific product by its id.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -228,6 +334,7 @@
     "/cart": {
       "post": {
         "description": "Adds a product to cart.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -255,6 +362,7 @@
       },
       "get": {
         "description": "Lists all carts.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -284,6 +392,7 @@
     "/cart/{cart_id}": {
       "get": {
         "description": "Lists a specific cart by its id.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -313,6 +422,7 @@
     "/cart/{cart_id}/{product_id}": {
       "delete": {
         "description": "Deletes a specific product by its id from a specific cart.",
+        "deprecated": false,
         "tags": [],
 
         "requestBody": {
@@ -343,7 +453,7 @@
 
   "components": {
     "schemas": {
-      "User": {
+      "UserRegisterRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -353,13 +463,79 @@
             "type": "string"
           },
           "password": {
-            "type": "string"
+            "description": "Hashed by Bcrypt.",
+            "type": "string",
+            "writeOnly": true
           },
           "isAdm": {
             "type": "boolean"
           }
         }
       },
+      "UserRegisterResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isAdm": {
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Generated by UUID V4.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      },
+      "UserRegisterErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "object"
+          },
+          "ValidationError": {
+            "type": "array"
+          }
+        }
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoginErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "object"
+          },
+          "ValidationError": {
+            "type": "array"
+          }
+        }
+      },
+
       "Product": {
         "type": "object",
         "properties": {
