@@ -1,21 +1,25 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
 
   "info": {
-    "title": "Kenzie Market!",
-    "description": "",
+    "title": "Kenzie Market API",
+    "description": "API protótipo destinada a registrar usuários, produtos e compras de um mercado. A presente API também notifica o usuário por email após uma compra ter sido feita.",
     "contact": {
-      "name": "",
-      "url": "",
-      "email": ""
+      "name": "API Support",
+      "url": "https://github.com/AndreKuratomi",
+      "email": "andrekuratomi@gmail.com"
     },
-    "version": ""
+    "version": "1.0.0"
   },
 
   "servers": [
     {
-      "url": "",
-      "description": ""
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    },
+    {
+      "url": "http://kenziemarket.herokuapp.com",
+      "description": "Production server"
     }
   ],
 
