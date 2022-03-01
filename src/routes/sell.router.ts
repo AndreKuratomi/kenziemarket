@@ -2,8 +2,8 @@ import { Router } from "express";
 
 import {
   makeSell,
-  // listAllSells,
-  // listOneSell,
+  listAllSells,
+  listOneSell,
 } from "../controllers/sell.controller";
 import { isUserAdmn } from "../middlewares/admin.middlewares";
 
@@ -13,7 +13,7 @@ const route = Router();
 
 export const sellRouter = () => {
   route.post("", isTokenValid, makeSell);
-  // route.get("", isTokenValid, isUserAdmn, listAllSells);
-  // route.get("/:id", isTokenValid, listOneSell);
+  route.get("", isTokenValid, isUserAdmn, listAllSells);
+  route.get("/:id", isTokenValid, listOneSell);
   return route;
 };
