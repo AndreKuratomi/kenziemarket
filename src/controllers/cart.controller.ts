@@ -42,7 +42,6 @@ export const addToCart = async (req: Request, res: Response) => {
           }
 
           const owner = userClient.id;
-          console.log(userClient.cart);
           // const [cart] = await cartRepository.find({ //outra maneira de escrever
           //[] denota que va ipegar o primeiro índice
           const cart = await cartRepository.find({
@@ -56,7 +55,6 @@ export const addToCart = async (req: Request, res: Response) => {
 
           // cart.product.push(doesAcquiredProductExist); //já está como primeiro elemento
           cart[0].product.push(doesAcquiredProductExist); //aqui delimitei
-          console.log(cart[0].product);
           const newCart = await cartRepository.save(cart);
 
           return res.json({
