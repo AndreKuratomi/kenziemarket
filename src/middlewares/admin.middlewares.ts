@@ -12,14 +12,14 @@ export const isUserAdmn = async (
   res: Response,
   next: NextFunction
 ) => {
-  const usersRepository = getRepository(User);
-  const isValidAdm = await usersRepository.find({ isAdm: true });
-
-  const auth = req.headers.authorization;
-
-  const tokenItself = areHeadersEnabled(auth);
-
   try {
+    const usersRepository = getRepository(User);
+    const isValidAdm = await usersRepository.find({ isAdm: true });
+
+    const auth = req.headers.authorization;
+
+    const tokenItself = areHeadersEnabled(auth);
+
     jwt.verify(
       tokenItself,
       config.secret as string,
@@ -29,9 +29,7 @@ export const isUserAdmn = async (
             return next();
           }
         }
-        // POR QUE NÃO ESTÁ RETORNANDO????
         throw new ErrorHandler("This user is not an administrator!", 401);
-        // res.status(401).json({ message: "This user is not an administrator!" });
       }
     );
   } catch (error: any) {
