@@ -33,7 +33,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
     return res.json(dataWithoutPassword);
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode).json({ message: error.message });
   }
 };
 
@@ -43,7 +43,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const token = await LoginUserService({ email, password });
     return res.json({ token: token });
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res.status(error.statusCode).json({ message: error.message });
   }
 };
 

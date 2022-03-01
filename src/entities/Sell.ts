@@ -16,17 +16,11 @@ class Sell {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column()
-  clientName: string;
-
-  @Column()
-  clientEmail: string;
-
-  @Column({ default: 0 })
-  totalPrice: number;
-
   @CreateDateColumn()
   createdOn!: Date;
+
+  @Column({ default: 0 })
+  totalPrice!: number;
 
   @OneToOne((type) => Cart)
   @JoinColumn()
@@ -35,11 +29,9 @@ class Sell {
   @ManyToOne((type) => User, (user) => user.sells)
   user!: User;
 
-  constructor(clientName: string, clientEmail: string, totalPrice: number) {
-    this.clientName = clientName;
-    this.clientEmail = clientEmail;
-    this.totalPrice = totalPrice;
-  }
+  // constructor(totalPrice: number) {
+  //   this.totalPrice = totalPrice;
+  // }
 }
 
 export default Sell;
