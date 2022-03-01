@@ -13,9 +13,9 @@ export const AddToCartSchema = yup.object().shape({
     .required("'type' is a required field!"),
   price: yup
     .number()
-    .typeError("'password' must be typeof string!")
+    .typeError("'price' must be typeof string!")
     .strict(true)
-    .required("'password' is a required field!")
+    .required("'price' is a required field!")
     .positive(),
   id: yup
     .string()
