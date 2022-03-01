@@ -1,0 +1,1001 @@
+{
+  "openapi": "3.0.3",
+
+  "info": {
+    "title": "Kenzie Market API",
+    "description": "API protótipo destinada a registrar usuários, produtos e compras de um mercado. A presente API também notifica o usuário por email após uma compra ter sido feita.",
+    "contact": {
+      "name": "API Support",
+      "url": "https://github.com/AndreKuratomi",
+      "email": "andrekuratomi@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    },
+    {
+      "url": "http://kenziemarket.herokuapp.com",
+      "description": "Production server"
+    }
+  ],
+
+  "paths": {
+    "/user": {
+      "post": {
+        "description": "Registers a user.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              },
+              "examples": {
+                "user": {
+                  "value": {
+                    "name": "André",
+                    "email": "mail@mail.com",
+                    "password": "1234",
+                    "isAdm": true
+                  }
+                },
+                "userWithErrors": {
+                  "value": {
+                    "email": "mailmail.com",
+                    "password": 1234,
+                    "isAdm": "true"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "message": {
+                        "ValidationError": [
+                          "'name' is a required field!",
+                          "Invalid email. Correct format example: 'email@email.com'",
+                          "'password' must be typeof string!",
+                          "'isAdm' must be typeof boolean!"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "message": "Email already registered!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UserRegisterResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "name": "André",
+                      "email": "mail@mail.com",
+                      "isAdm": true,
+                      "id": "996a4147-beb7-4263-9cd3-84edcca4e135",
+                      "createdOn": "2022-02-28T04:07:15.794Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "security": [{}]
+      },
+
+      "get": {
+        "description": "Lists all users.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "users": {
+                    "value": [
+                      {
+                        "name": "André",
+                        "email": "mail@mail.com",
+                        "isAdm": true,
+                        "id": "996a4147-beb7-4263-9cd3-84edcca4e135",
+                        "createdOn": "2022-02-28T04:07:15.794Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "description": "Logs a user.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              },
+              "examples": {
+                "login": {
+                  "value": {
+                    "email": "mail@mail.com",
+                    "password": "1234"
+                  }
+                },
+                "loginWithErrors": {
+                  "value": {
+                    "email": "mailmail.com",
+                    "password": 1234
+                  }
+                },
+                "loginUnknownUser": {
+                  "value": {
+                    "email": "unknown@mail.com",
+                    "password": "1234"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "loginError": {
+                    "value": {
+                      "message": {
+                        "ValidationError": [
+                          "Invalid email. Correct format example: 'email@email.com'",
+                          "The field 'password' must be typeof string!"
+                        ]
+                      }
+                    }
+                  },
+                  "notFoundUser": {
+                    "value": {
+                      "message": "No user found!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UserLoginResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEzNGQxNGVmLWRhMTYtNDQ3MC05NTM0LWVlMjM4NDEwYWQ4YyIsImlhdCI6MTY0NTQ1ODc2MiwiZXhwIjoxNjQ1NTQ1MTYyfQ.wGR1i-y6pxUbXxtFGzA-vYdhuusxp9nyI2K7GEUPF44"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "security": [{}]
+      }
+    },
+    "/user/{user_id}": {
+      "get": {
+        "description": "Lists a specific user by its id.",
+        "deprecated": false,
+        "tags": [],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "404": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "Id not found": {
+                    "value": {
+                      "message": "Id must be UUID!"
+                    }
+                  },
+                  "notFoundUser": {
+                    "value": {
+                      "message": "No user found!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/OneUserListResponse"
+                },
+                "examples": {
+                  "user": {
+                    "value": {
+                      "name": "André",
+                      "email": "mail@mail.com",
+                      "isAdm": true,
+                      "id": "996a4147-beb7-4263-9cd3-84edcca4e135",
+                      "createdOn": "2022-02-28T04:07:15.794Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/product": {
+      "post": {
+        "description": "Registers a product.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductRegisterRequest"
+              },
+              "examples": {
+                "product": {
+                  "value": {
+                    "name": "Doritos",
+                    "type": "Porcaria",
+                    "price": 10
+                  }
+                },
+                "productWithErrors": {
+                  "value": {
+                    "name": true,
+                    "price": "10"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "product": {
+                    "value": {
+                      "message": {
+                        "ValidationError": [
+                          "'name' must be typeof string!",
+                          "'type' is a required field!",
+                          "'password' must be typeof string!"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "product": {
+                    "value": {
+                      "message": "Product already registered!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/ProductRegisterResponse"
+                },
+                "example": {
+                  "product": {
+                    "value": {
+                      "name": "Doritos",
+                      "type": "Porcaria",
+                      "price": 10,
+                      "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                      "createdOn": "2022-03-01T01:55:07.549Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "get": {
+        "description": "Lists all products.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                },
+                "example": {
+                  "products": {
+                    "value": [
+                      {
+                        "name": "Doritos",
+                        "type": "Porcaria",
+                        "price": 10,
+                        "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                        "createdOn": "2022-03-01T01:55:07.549Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "security": [{}]
+      }
+    },
+    "/product/{product_id}": {
+      "get": {
+        "description": "Lists a specific product by its id.",
+        "deprecated": false,
+        "tags": [],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "404": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "Id not found": {
+                    "value": {
+                      "message": "No id found!"
+                    }
+                  },
+                  "notFoundProduct": {
+                    "value": {
+                      "message": "No product found!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/OneProductListResponse"
+                },
+                "examples": {
+                  "product": {
+                    "value": {
+                      "name": "Doritos",
+                      "type": "Porcaria",
+                      "price": 10,
+                      "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                      "createdOn": "2022-03-01T01:55:07.549Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "security": [{}]
+      }
+    },
+
+    "/cart": {
+      "post": {
+        "description": "Adds a product to cart.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#/components/schemas/AddToCartRequest"
+              },
+              "examples": {
+                "product": {
+                  "value": {
+                    "name": "Doritos",
+                    "type": "Porcaria",
+                    "price": 10,
+                    "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                    "createdOn": "2022-03-01T01:55:07.549Z"
+                  }
+                },
+                "productWithErrors": {
+                  "value": {
+                    "type": "Porcaria",
+                    "price": 10,
+                    "id": "b82935c6-be03--b458-a680d56f2c",
+                    "createdOn": "-02-21T18:58:21.154Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "message": {
+                    "ValidationError": [
+                      "'name' is a required field!",
+                      "Minimun of 36 digits for id field!",
+                      "Minimun of 24 digits for createdOn field!"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "product": {
+                    "value": {
+                      "message": "Product succesfully added to your cart!",
+                      "cart": [
+                        {
+                          "id": "a34d14ef-da16-4470-9534-ee238410ad8c",
+                          "createdOn": "2022-02-21T18:43:42.587Z",
+                          "product": [
+                            {
+                              "name": "Doritos",
+                              "type": "Porcaria",
+                              "price": 10,
+                              "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                              "createdOn": "2022-03-01T01:55:07.549Z"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "get": {
+        "description": "Lists all carts.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                },
+                "example": {
+                  "carts": {
+                    "value": [
+                      {
+                        "id": "f512c357-33cb-4eba-9fd8-d31b7618b145",
+                        "createdOn": "2022-03-01T00:00:15.703Z",
+                        "product": [
+                          {
+                            "name": "Doritos",
+                            "type": "Porcaria",
+                            "price": 10,
+                            "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                            "createdOn": "2022-03-01T01:55:07.549Z"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/{cart_id}": {
+      "get": {
+        "description": "Lists a specific cart by its id.",
+        "deprecated": false,
+        "tags": [],
+        "parameters": [
+          {
+            "name": "cart_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "201": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "product": {
+                    "value": {
+                      "id": "a34d14ef-da16-4470-9534-ee238410ad8c",
+                      "createdOn": "2022-02-21T18:43:42.587Z",
+                      "product": [
+                        {
+                          "name": "Doritos",
+                          "type": "Porcaria",
+                          "price": 10,
+                          "id": "d1af425a-bd3b-4673-924b-a043ec1f17e6",
+                          "createdOn": "2022-03-01T01:55:07.549Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/{cart_id}/{product_id}": {
+      "delete": {
+        "description": "Deletes a specific product by its id from a specific cart.",
+        "deprecated": false,
+        "tags": [],
+        "parameters": [
+          {
+            "name": "cart_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "notFoundCart": {
+                    "value": {
+                      "message": "No cart found!"
+                    }
+                  },
+                  "notFoundProduct": {
+                    "value": {
+                      "message": "No product found!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "message": "Product Doritos deleted from cart of client André"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "UserRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "description": "Hashed by Bcrypt.",
+            "type": "string",
+            "writeOnly": true
+          },
+          "isAdm": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserRegisterResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isAdm": {
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Generated by UUID V4.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "OneUserListResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isAdm": {
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Generated by UUID V4.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      },
+
+      "ProductRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "ProductRegisterResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "id": {
+            "description": "Generated by UUID V4.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "OneProductListResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "id": {
+            "description": "Generated by UUID V4.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      },
+
+      "AddToCartRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+
+  "security": [
+    {
+      "Bearer": []
+    },
+    {
+      "BasicAuth": []
+    }
+  ]
+}

@@ -13,11 +13,11 @@ import {
 } from "../services/product.service";
 
 export const registerProduct = async (req: Request, res: Response) => {
-  const newBody = await RegisterProductService(req.body);
-
   const ProductCustomRepository = getCustomRepository(ProductRepository);
 
   try {
+    const newBody = await RegisterProductService(req.body);
+
     const { name, type, price } = newBody;
     const product = ProductCustomRepository.create({
       name,
