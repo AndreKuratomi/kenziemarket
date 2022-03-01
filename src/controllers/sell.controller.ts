@@ -112,11 +112,10 @@ export const listOneSell = async (req: Request, res: Response) => {
   const SellCustomRepository = getCustomRepository(SellRepository);
   const UserCustomRepository = getCustomRepository(UserRepository);
 
-  const { id } = req.params;
-
   try {
-    const auth = req.headers.authorization;
+    const { id } = req.params;
 
+    const auth = req.headers.authorization;
     const tokenItself = areHeadersEnabled(auth);
 
     jwt.verify(
@@ -125,16 +124,6 @@ export const listOneSell = async (req: Request, res: Response) => {
       async (err, decoded: any) => {
         try {
           const tokenId = decoded.id;
-
-          const selectedSell = await SellCustomRepository.findOne({
-            id: tokenId,
-          });
-          if (!selectedSell) {
-            throw new ErrorHandler(
-              "No sell found or the user is not owner of this sell!",
-              404
-            );
-          }
 
           const selectedUser = await UserCustomRepository.findOne({
             id: tokenId,
@@ -145,8 +134,17 @@ export const listOneSell = async (req: Request, res: Response) => {
 
           // if (selectedSell.user.isAdm === true) { //undefined porque não há persistência
           if (selectedUser.isAdm === true) {
+            const selectedSell = await SellCustomRepository.findOne({
+              id: id,
+            });
+            if (!selectedSell) {
+              throw new ErrorHandler("No sell found!", 404);
+            }
             return res.json(selectedSell);
           } else if (decoded.id === id) {
+            const selectedSell = await SellCustomRepository.findOne({
+              id: tokenId,
+            });
             return res.json(selectedSell);
           } else {
             throw new ErrorHandler(
