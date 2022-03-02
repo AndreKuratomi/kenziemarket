@@ -148,7 +148,7 @@ export const listOneSell = async (req: Request, res: Response) => {
             if (!selectedSell) {
               throw new ErrorHandler("No sell found!", 404);
             }
-            return res.json(selectedSell);
+            return res.json(selectedSell), 200;
           } else if (decoded.id === id) {
             const selectedSell = await SellCustomRepository.findOne({
               id: tokenId,
