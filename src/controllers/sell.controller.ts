@@ -8,6 +8,7 @@ import { areHeadersEnabled } from "../services/token.service";
 import CartRepository from "../repository/cart.repository";
 import UserRepository from "../repository/user.repository";
 import SellRepository from "../repository/sell.repository";
+import { sendSellEmail } from "../services/mailer";
 
 export const makeSell = async (req: Request, res: Response) => {
   const UserCustomRepository = getCustomRepository(UserRepository);
@@ -57,6 +58,14 @@ export const makeSell = async (req: Request, res: Response) => {
 
           const newSell = await SellCustomRepository.save(actualSell);
 
+          const email = actualSell.user.email;
+          const name = actualSell.user.name;
+          const date = actualSell.createdOn;
+          const products = actualSell.cart.product;
+          const totalPrice = actualSell.totalPrice;
+
+          await sendSellEmail(email, name, date, products, totalPrice);
+
           return res.json({
             message: "Sell succesfully done!",
             user: actualSell.user.id,
@@ -68,7 +77,6 @@ export const makeSell = async (req: Request, res: Response) => {
         }
       }
     );
-    //   não esquecer de mandar email!
   } catch (error: any) {
     res.status(error.statusCode).json({ message: error.message });
   }
