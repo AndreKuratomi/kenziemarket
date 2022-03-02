@@ -3,7 +3,7 @@
 
   "info": {
     "title": "Kenzie Market API",
-    "description": "API protótipo destinada a registrar usuários, produtos e compras de um mercado. A presente API também notifica o usuário por email após uma compra ter sido feita.",
+    "description": "API protótipo destinada a registrar usuários, produtos e compras de um mercado. A API também notifica o usuário por email após uma compra ter sido feita.",
     "contact": {
       "name": "API Support",
       "url": "https://github.com/AndreKuratomi",
@@ -788,6 +788,147 @@
                 },
                 "example": {
                   "message": "Product Doritos deleted from cart of client André"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/buy": {
+      "post": {
+        "description": "Makes a sell.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "product": {
+                    "value": {
+                      "message": "Sell succesfully done!",
+                      "user": "0393cccc-d063-4b2e-b146-d61631bb4c1b",
+                      "sell": [
+                        {
+                          "name": "Porquitos",
+                          "type": "Porcaria",
+                          "price": 10,
+                          "id": "591c625e-87b9-49bb-a039-4897b5d13446",
+                          "createdOn": "2022-03-01T20:11:02.661Z"
+                        }
+                      ],
+                      "total_price": 10
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "get": {
+        "description": "Lists all sells.",
+        "deprecated": false,
+        "tags": [],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                },
+                "example": {
+                  "sells": {
+                    "value": [
+                      {
+                        "id": "c9b34dd3-94a1-4469-bec6-d051c4dd783f",
+                        "createdOn": "2022-03-01T20:10:39.537Z",
+                        "totalPrice": 10,
+                        "user": {
+                          "name": "André",
+                          "email": "mail@mail.com",
+                          "id": "c9b34dd3-94a1-4469-bec6-d051c4dd783f"
+                        },
+                        "cart": {
+                          "id": "c9b34dd3-94a1-4469-bec6-d051c4dd783f",
+                          "createdOn": "2022-03-01T20:10:39.537Z"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/buy/{buy_id}": {
+      "get": {
+        "description": "Lists a specific sell by its id.",
+        "deprecated": false,
+        "tags": [],
+        "parameters": [
+          {
+            "name": "buy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "requestBody": {
+          "description": "No content body required",
+          "content": {},
+          "required": false
+        },
+
+        "responses": {
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "sell": {
+                    "value": {
+                      "id": "0393cccc-d063-4b2e-b146-d61631bb4c1b",
+                      "createdOn": "2022-03-02T05:55:29.448Z",
+                      "totalPrice": 10
+                    }
+                  }
                 }
               }
             }
