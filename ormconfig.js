@@ -42,9 +42,24 @@ const testEnv = {
   },
 };
 
+const prodEnv = {
+  type: "postgres",
+  url: process.env.DATABASE_URL,
+  entities: ["./build/entities/**/*.js"],
+  migrations: ["./build/migrations/**/*.js"],
+  cli: { migrationsDir: "./build/database/migrations" },
+  synchronize: false,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
+};
+
 let exportModule = undefined;
 if (process.env.NODE_ENV === "supertest") {
   exportModule = testEnv;
+} else if (process.env.NODE_ENV === "production") {
+  exportModule = prodEnv;
 } else {
   exportModule = devEnv;
 }
