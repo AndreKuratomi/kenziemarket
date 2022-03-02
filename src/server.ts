@@ -7,7 +7,7 @@ const PORT = 3000;
 createConnection()
   .then(() => {
     console.log("Database connected!");
-    app.listen(PORT, () => {
+    app.listen(process.env.PORT || PORT, () => {
       console.log(`Running at http://localhost:${PORT}`);
     });
   })

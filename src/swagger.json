@@ -18,7 +18,7 @@
       "description": "Local server"
     },
     {
-      "url": "http://kenziemarket.herokuapp.com",
+      "url": "http://kenziemarketn.herokuapp.com",
       "description": "Production server"
     }
   ],
